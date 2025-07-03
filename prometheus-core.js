@@ -881,28 +881,78 @@ class PrometheusApplication {
             
             // 2. AuthManager ensuite (dépend de DataManager)
             logger.debug('Initializing AuthManager');
-            this.authManager = new AuthManager(this.dataManager); // CORRIGÉ: était AuthenticationManager
+            
+            // Vérifier que AuthManager est disponible
+            if (typeof AuthManager === 'undefined') {
+                logger.error('AuthManager class not found - check if prometheus-auth.js loaded correctly');
+                throw new Error('AuthManager class not available');
+            }
+            
+            this.authManager = new AuthManager(this.dataManager);
             await this.authManager.initialize();
             
-            // 3. Managers métier (dépendent de DataManager et AuthManager)
+            // 3. Vérifier que les autres classes sont disponibles avant de les instancier
             logger.debug('Initializing business managers');
-            this.searchManager = new SearchManager(this);
-            this.timeTracker = new TimeTracker(this);
-            this.clientManager = new ClientManager(this);
-            this.matterManager = new MatterManager(this);
-            this.billingManager = new BillingManager(this);
-            this.documentManager = new DocumentManager(this);
-            this.analyticsManager = new AnalyticsManager(this);
+            
+            // Initialiser seulement les managers qui sont disponibles
+            if (typeof SearchManager !== 'undefined') {
+                this.searchManager = new SearchManager(this);
+            } else {
+                logger.warn('SearchManager not available');
+            }
+            
+            if (typeof TimeTracker !== 'undefined') {
+                this.timeTracker = new TimeTracker(this);
+            } else {
+                logger.warn('TimeTracker not available');
+            }
+            
+            if (typeof ClientManager !== 'undefined') {
+                this.clientManager = new ClientManager(this);
+            } else {
+                logger.warn('ClientManager not available');
+            }
+            
+            if (typeof MatterManager !== 'undefined') {
+                this.matterManager = new MatterManager(this);
+            } else {
+                logger.warn('MatterManager not available');
+            }
+            
+            if (typeof BillingManager !== 'undefined') {
+                this.billingManager = new BillingManager(this);
+            } else {
+                logger.warn('BillingManager not available');
+            }
+            
+            if (typeof DocumentManager !== 'undefined') {
+                this.documentManager = new DocumentManager(this);
+            } else {
+                logger.warn('DocumentManager not available');
+            }
+            
+            if (typeof AnalyticsManager !== 'undefined') {
+                this.analyticsManager = new AnalyticsManager(this);
+            } else {
+                logger.warn('AnalyticsManager not available');
+            }
             
             // 4. UIManager en dernier (dépend de tous les autres)
             logger.debug('Initializing UIManager');
-            this.uiManager = new UIManager(this);
-            await this.uiManager.initialize(); // AJOUTÉ: appel à initialize()
+            
+            if (typeof UIManager !== 'undefined') {
+                this.uiManager = new UIManager(this);
+                if (this.uiManager.initialize) {
+                    await this.uiManager.initialize();
+                }
+            } else {
+                logger.warn('UIManager not available');
+            }
             
             // Exposer les managers globalement pour onClick handlers
             this.exposeGlobalManagers();
             
-            logger.info('All managers initialized successfully');
+            logger.info('All available managers initialized successfully');
             
         } catch (error) {
             this.state.performance.initErrors.push('Manager initialization failed');
@@ -1962,7 +2012,7 @@ class DataManager {
     
     loadFromStorage() {
         try {
-            const keys = ['clients', 'matters', 'timeEntries', 'invoices', 'documents', 'settings'];
+            const keys = ['clients', 'matters', 'timeEntries', 'invoices', 'documents', 'settings', 'users', 'sessions'];
             
             keys.forEach(key => {
                 try {
@@ -1970,10 +2020,22 @@ class DataManager {
                     if (data) {
                         this.storage[key] = JSON.parse(data);
                         logger.debug(`Loaded ${key}`, { count: Array.isArray(this.storage[key]) ? this.storage[key].length : 'N/A' });
+                    } else {
+                        // Initialiser avec un tableau vide pour les collections
+                        if (['clients', 'matters', 'timeEntries', 'invoices', 'documents', 'users', 'sessions'].includes(key)) {
+                            this.storage[key] = [];
+                        } else {
+                            this.storage[key] = {};
+                        }
                     }
                 } catch (parseError) {
                     logger.warn(`Failed to parse ${key} from storage`, parseError);
-                    this.storage[key] = Array.isArray(this.storage[key]) ? [] : {};
+                    // Réinitialiser avec des valeurs par défaut
+                    if (['clients', 'matters', 'timeEntries', 'invoices', 'documents', 'users', 'sessions'].includes(key)) {
+                        this.storage[key] = [];
+                    } else {
+                        this.storage[key] = {};
+                    }
                 }
             });
             
@@ -1981,7 +2043,45 @@ class DataManager {
             
         } catch (error) {
             logger.error('Failed to load data from storage', error);
-            this.loadFromBackup();
+            this.initializeEmptyStorage();
+        }
+    }
+    
+    initializeEmptyStorage() {
+        this.storage = {
+            clients: [],
+            matters: [],
+            timeEntries: [],
+            invoices: [],
+            documents: [],
+            users: [],
+            sessions: [],
+            settings: {},
+            backups: []
+        };
+        
+        logger.info('Initialized empty storage structure');
+    }
+    
+    // Méthode helper pour AuthManager
+    save(key, data) {
+        try {
+            this.storage[key] = data;
+            this.saveToStorage(key);
+            return true;
+        } catch (error) {
+            logger.error(`Failed to save ${key}`, error);
+            return false;
+        }
+    }
+    
+    // Méthode helper pour AuthManager
+    load(key, defaultValue = null) {
+        try {
+            return this.storage[key] || defaultValue;
+        } catch (error) {
+            logger.error(`Failed to load ${key}`, error);
+            return defaultValue;
         }
     }
     

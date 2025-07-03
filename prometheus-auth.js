@@ -1,81 +1,12 @@
 // PROMETHEUS.EXE - AUTHENTICATION & USER MANAGEMENT SYSTEM
 // BOURDON & Associates - Security Layer
-// Version: 2.0.0 - Production Ready
+// Version: 2.0.1 - CORRECTION: Removed duplicate USER_ROLES declaration
 
 'use strict';
 
 // ========================================
-// USER ROLES & PERMISSIONS SYSTEM
+// PERMISSIONS SYSTEM (pas de redéclaration de USER_ROLES)
 // ========================================
-const USER_ROLES = {
-    FOUNDING_PARTNER: {
-        id: 'founding_partner',
-        name: 'Founding Partner',
-        level: 5,
-        rate: 750,
-        permissions: ['*'], // All permissions
-        description: 'Full system access'
-    },
-    PARTNER: {
-        id: 'partner',
-        name: 'Partner',
-        level: 4,
-        rate: 500,
-        permissions: [
-            'clients.view', 'clients.create', 'clients.edit', 'clients.delete',
-            'matters.view', 'matters.create', 'matters.edit', 'matters.delete',
-            'time.view', 'time.create', 'time.edit', 'time.delete',
-            'billing.view', 'billing.create', 'billing.edit', 'billing.export',
-            'documents.view', 'documents.upload', 'documents.edit', 'documents.delete',
-            'analytics.view', 'analytics.export',
-            'users.view', 'users.create', 'users.edit',
-            'system.backup'
-        ],
-        description: 'Senior management access'
-    },
-    ASSOCIATE: {
-        id: 'associate',
-        name: 'Associate',
-        level: 3,
-        rate: 250,
-        permissions: [
-            'clients.view', 'clients.create', 'clients.edit',
-            'matters.view', 'matters.create', 'matters.edit',
-            'time.view', 'time.create', 'time.edit',
-            'billing.view', 'billing.create',
-            'documents.view', 'documents.upload', 'documents.edit',
-            'analytics.view'
-        ],
-        description: 'Standard legal professional access'
-    },
-    ASSISTANT: {
-        id: 'assistant',
-        name: 'Legal Assistant',
-        level: 2,
-        rate: 150,
-        permissions: [
-            'clients.view', 'clients.create',
-            'matters.view', 'matters.create',
-            'time.view', 'time.create',
-            'documents.view', 'documents.upload',
-            'billing.view'
-        ],
-        description: 'Administrative support access'
-    },
-    INTERN: {
-        id: 'intern',
-        name: 'Intern',
-        level: 1,
-        rate: 50,
-        permissions: [
-            'clients.view',
-            'matters.view',
-            'time.view', 'time.create',
-            'documents.view'
-        ],
-        description: 'Limited trainee access'
-    }
-};
 
 const PERMISSIONS = {
     // Client permissions
@@ -129,19 +60,41 @@ class AuthManager {
     constructor(dataManager) {
         this.dataManager = dataManager;
         this.currentSession = null;
-        this.users = this.dataManager.load('users', this.getDefaultUsers());
-        this.sessions = this.dataManager.load('sessions', []);
+        this.users = [];
+        this.sessions = [];
         this.loginAttempts = new Map();
         this.maxLoginAttempts = 5;
         this.lockoutDuration = 15 * 60 * 1000; // 15 minutes
         
-        // Initialize default admin if no users exist
-        if (this.users.length === 0) {
-            this.createDefaultAdmin();
+        // Vérifier que USER_ROLES est disponible (défini dans prometheus-core.js)
+        if (typeof USER_ROLES === 'undefined') {
+            console.error('USER_ROLES not available - ensure prometheus-core.js is loaded first');
+            return;
         }
-        
-        // Clean expired sessions on startup
-        this.cleanExpiredSessions();
+    }
+
+    async initialize() {
+        try {
+            console.log('🔐 Initializing AuthManager...');
+            
+            // Charger les données utilisateur
+            this.users = this.dataManager.read('users') || [];
+            this.sessions = this.dataManager.read('sessions') || [];
+            
+            // Créer l'admin par défaut si aucun utilisateur n'existe
+            if (this.users.length === 0) {
+                this.createDefaultAdmin();
+            }
+            
+            // Nettoyer les sessions expirées
+            this.cleanExpiredSessions();
+            
+            console.log('✅ AuthManager initialized successfully');
+            
+        } catch (error) {
+            console.error('❌ AuthManager initialization failed:', error);
+            throw error;
+        }
     }
 
     getDefaultUsers() {
@@ -167,10 +120,14 @@ class AuthManager {
     }
 
     createDefaultAdmin() {
-        const defaultAdmin = this.getDefaultUsers()[0];
-        this.users = [defaultAdmin];
-        this.saveUsers();
-        console.log('Default admin user created');
+        try {
+            const defaultAdmin = this.getDefaultUsers()[0];
+            this.users = [defaultAdmin];
+            this.dataManager.saveToStorage('users');
+            console.log('✅ Default admin user created');
+        } catch (error) {
+            console.error('❌ Failed to create default admin:', error);
+        }
     }
 
     // ========================================
@@ -574,6 +531,23 @@ class AuthManager {
         }
     }
 
+    restoreSession() {
+        try {
+            const savedSession = localStorage.getItem('prometheus_current_session');
+            if (savedSession) {
+                const sessionData = JSON.parse(savedSession);
+                const validSession = this.validateSession(sessionData.id);
+                if (validSession) {
+                    this.currentSession = validSession;
+                    return true;
+                }
+            }
+        } catch (error) {
+            console.warn('Failed to restore session:', error);
+        }
+        return false;
+    }
+
     // ========================================
     // UTILITY METHODS
     // ========================================
@@ -625,19 +599,49 @@ class AuthManager {
     }
 
     showLoginScreen() {
-        // This will be implemented in the UI layer
-        console.log('Should show login screen');
+        if (typeof authUI !== 'undefined' && authUI.showLoginScreen) {
+            authUI.showLoginScreen();
+        } else {
+            console.warn('AuthUI not available, showing fallback login');
+            this.showFallbackLogin();
+        }
+    }
+    
+    showFallbackLogin() {
+        // Fallback basique si AuthUI n'est pas chargé
+        const loginPrompt = prompt('Username:');
+        if (loginPrompt) {
+            const passwordPrompt = prompt('Password:');
+            if (passwordPrompt) {
+                return this.login(loginPrompt, passwordPrompt);
+            }
+        }
+        throw new Error('Login cancelled');
     }
 
     // ========================================
     // DATA PERSISTENCE
     // ========================================
     saveUsers() {
-        this.dataManager.save('users', this.users);
+        try {
+            if (this.dataManager && this.dataManager.saveToStorage) {
+                this.dataManager.storage.users = this.users;
+                this.dataManager.saveToStorage('users');
+            }
+        } catch (error) {
+            console.error('Failed to save users:', error);
+        }
     }
 
     saveSessions() {
-        this.dataManager.save('sessions', this.sessions);
+        try {
+            if (this.dataManager && this.dataManager.saveToStorage) {
+                this.dataManager.storage.sessions = this.sessions;
+                this.dataManager.saveToStorage('sessions');
+            }
+        } catch (error) {
+            console.error('Failed to save sessions:', error);
+        }
     }
 
     // ========================================
@@ -673,89 +677,10 @@ class AuthManager {
 
         return auditEvents;
     }
-
-    // ========================================
-    // SYSTEM INITIALIZATION
-    // ========================================
-    initialize() {
-        console.log('AuthManager initialized');
-        console.log(`Users: ${this.users.length}, Active sessions: ${this.sessions.filter(s => s.isActive).length}`);
-        
-        // Auto-extend session every 30 minutes if user is active
-        setInterval(() => {
-            if (this.isLoggedIn()) {
-                this.extendSession();
-            }
-        }, 30 * 60 * 1000);
-
-        // Clean expired sessions every hour
-        setInterval(() => {
-            this.cleanExpiredSessions();
-        }, 60 * 60 * 1000);
-    }
-     showLoginScreen() {
-        if (typeof authUI !== 'undefined' && authUI.showLoginScreen) {
-            authUI.showLoginScreen();
-        } else {
-            console.warn('AuthUI not available, showing fallback login');
-            this.showFallbackLogin();
-        }
-    }
-    
-    showFallbackLogin() {
-        // Fallback basique si AuthUI n'est pas chargé
-        const loginPrompt = prompt('Username:');
-        if (loginPrompt) {
-            const passwordPrompt = prompt('Password:');
-            if (passwordPrompt) {
-                return this.login(loginPrompt, passwordPrompt);
-            }
-        }
-        throw new Error('Login cancelled');
-    }
-    
-    // CORRIGER le hachage faible (CRITIQUE pour sécurité)
-    hashPassword(password) {
-        // TODO: Remplacer par bcrypt en production
-        // Cette implémentation est temporaire et DANGEREUSE
-        console.warn('🚨 SÉCURITÉ: Hachage faible utilisé - remplacer par bcrypt');
-        
-        // Amélioration temporaire avec crypto API si disponible
-        if (window.crypto && window.crypto.subtle) {
-            // Utiliser Web Crypto API si disponible
-            return this.hashPasswordCrypto(password);
-        }
-        
-        // Fallback amélioré (mais toujours faible)
-        const salt = 'prometheus_salt_2024_' + Date.now();
-        let hash = 0;
-        const combined = password + salt;
-        
-        for (let i = 0; i < combined.length; i++) {
-            const char = combined.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash;
-        }
-        
-        // Ajouter plusieurs passes
-        for (let i = 0; i < 1000; i++) {
-            hash = ((hash << 5) - hash) + hash;
-            hash = hash & hash;
-        }
-        
-        return Math.abs(hash).toString(16) + '_' + salt.slice(-8);
-    }
-    
-    async hashPasswordCrypto(password) {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(password + 'prometheus_salt_2024');
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    }
 }
 
-// Export for module usage
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { AuthManager, USER_ROLES, PERMISSIONS };
-}
+// Export for global access
+window.AuthManager = AuthManager;
+window.PERMISSIONS = PERMISSIONS;
+
+console.log('✅ AuthManager loaded successfully');
