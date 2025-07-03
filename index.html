@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Prometheus - Professional Legal Management Software for BOURDON & Associates">
+    <meta name="author" content="BOURDON Conseils">
+    <title>Prometheus - BOURDON Conseils</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+        <div class="nav-brand">
+            <h2>Prometheus</h2>
+            <span>BOURDON Conseils</span>
+        </div>
+        <div class="nav-menu" role="menubar">
+            <button class="nav-btn active" data-section="dashboard" onclick="showSection('dashboard')" role="menuitem" aria-label="Dashboard">Dashboard</button>
+            <button class="nav-btn" data-section="clients" onclick="showSection('clients')" role="menuitem" aria-label="Client Management">Clients</button>
+            <button class="nav-btn" data-section="matters" onclick="showSection('matters')" role="menuitem" aria-label="Matter Management">Matters</button>
+            <button class="nav-btn" data-section="timetracking" onclick="showSection('timetracking')" role="menuitem" aria-label="Time Tracking">Time Tracking</button>
+            <button class="nav-btn" data-section="billing" onclick="showSection('billing')" role="menuitem" aria-label="Billing & Invoicing">Billing</button>
+            <button class="nav-btn" data-section="documents" onclick="showSection('documents')" role="menuitem" aria-label="Document Management">Documents</button>
+            <button class="nav-btn" data-section="analytics" onclick="showSection('analytics')" role="menuitem" aria-label="Analytics & Reporting">Analytics</button>
+        </div>
+        <div class="timer-widget" role="region" aria-label="Timer widget">
+            <button id="timerBtn" onclick="toggleTimer()" aria-label="Start or stop timer">▶️ Start Timer</button>
+            <span id="timerDisplay" aria-live="polite" aria-label="Current timer">00:00:00</span>
+        </div>
+    </nav>
+    <main>
+        <section id="dashboard" class="main-section active" role="main" aria-label="Dashboard">
+            <div class="dashboard-header">
+                <h1>Dashboard</h1>
+                <div class="quick-stats" role="region" aria-label="Quick statistics">
+                    <div class="stat-card">
+                        <h3 id="totalClients" aria-label="Total clients">0</h3>
+                        <p>Clients</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="totalMatters" aria-label="Total matters">0</h3>
+                        <p>Matters</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="totalHours" aria-label="Total hours this month">0.0</h3>
+                        <p>Hours (Month)</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="totalRevenue" aria-label="Estimated revenue">0€</h3>
+                        <p>Estimated Revenue</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-content">
+                <div class="recent-matters">
+                    <h3>Recent Matters</h3>
+                    <div id="recentMattersList" class="matters-list" role="region" aria-label="Recent matters list">
+                        <p class="empty-state">No matters created yet</p>
+                    </div>
+                </div>
+                
+                <div class="recent-time">
+                    <h3>Today's Time</h3>
+                    <div id="todayTimeList" class="time-list" role="region" aria-label="Today's time entries">
+                        <p class="empty-state">No time entries recorded</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CLIENTS SECTION -->
+        <section id="clients" class="main-section" role="main" aria-label="Client Management">
+            <div class="section-header">
+                <h1>Client Management</h1>
+                <button class="btn-primary" onclick="showAddClientForm()" aria-label="Add new client">+ New Client</button>
+            </div>
+            
+            <div id="addClientForm" class="form-container" style="display: none;" role="form" aria-label="Add new client form">
+                <h3>New Client</h3>
+                <form onsubmit="addClient(event)" novalidate>
+                    <label for="clientName" class="sr-only">Client Name</label>
+                    <input type="text" id="clientName" placeholder="Client name" required aria-required="true">
+                    
+                    <label for="clientContact" class="sr-only">Primary Contact</label>
+                    <input type="text" id="clientContact" placeholder="Primary contact" aria-describedby="contact-help">
+                    
+                    <label for="clientEmail" class="sr-only">Email Address</label>
+                    <input type="email" id="clientEmail" placeholder="Email address" aria-describedby="email-help">
+                    
+                    <label for="clientTier" class="sr-only">Client Tier</label>
+                    <select id="clientTier" aria-label="Select client tier">
+                        <option value="Tier 1">Tier 1 - Premium</option>
+                        <option value="Tier 2">Tier 2 - Standard</option>
+                        <option value="Tier 3">Tier 3 - Basic</option>
+                    </select>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Create Client</button>
+                        <button type="button" class="btn-secondary" onclick="hideAddClientForm()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div id="clientsList" class="clients-list" role="region" aria-label="Clients list">
+                <p class="empty-state">No clients created yet</p>
+            </div>
+        </section>
+
+        <!-- MATTERS SECTION -->
+        <section id="matters" class="main-section" role="main" aria-label="Matter Management">
+            <div class="section-header">
+                <h1>Matter Management</h1>
+                <button class="btn-primary" onclick="showAddMatterForm()" aria-label="Add new matter">+ New Matter</button>
+            </div>
+            
+            <div id="addMatterForm" class="form-container" style="display: none;" role="form" aria-label="Add new matter form">
+                <h3>New Matter</h3>
+                <form onsubmit="addMatter(event)" novalidate>
+                    <label for="matterPractice" class="sr-only">Practice Area</label>
+                    <select id="matterPractice" required aria-required="true" aria-label="Select practice area">
+                        <option value="">Select Practice Area</option>
+                        <option value="MA">MA - Mergers & Acquisitions</option>
+                        <option value="CP">CP - Corporate</option>
+                        <option value="LTG">LTG - Litigation</option>
+                        <option value="LT">LT - Legal & Tax</option>
+                        <option value="BK">BK - Banking</option>
+                        <option value="MT">MT - Monetary</option>
+                        <option value="FM">FM - Financial Market</option>
+                        <option value="PL">PL - Private Laws</option>
+                        <option value="IP">IP - Intellectual Property</option>
+                    </select>
+                    
+                    <label for="matterClient" class="sr-only">Client</label>
+                    <select id="matterClient" required aria-required="true" aria-label="Select client">
+                        <option value="">Select Client</option>
+                    </select>
+                    
+                    <label for="matterTitle" class="sr-only">Matter Title</label>
+                    <input type="text" id="matterTitle" placeholder="Matter title" required aria-required="true">
+                    
+                    <label for="matterDescription" class="sr-only">Matter Description</label>
+                    <textarea id="matterDescription" placeholder="Matter description" rows="4" aria-describedby="description-help"></textarea>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Create Matter</button>
+                        <button type="button" class="btn-secondary" onclick="hideAddMatterForm()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div id="mattersList" class="matters-list" role="region" aria-label="Matters list">
+                <p class="empty-state">No matters created yet</p>
+            </div>
+        </section>
+
+        <!-- TIME TRACKING SECTION -->
+        <section id="timetracking" class="main-section" role="main" aria-label="Time Tracking">
+            <div class="section-header">
+                <h1>Time Tracking</h1>
+            </div>
+            
+            <div class="timer-section" role="region" aria-label="Timer controls">
+                <div class="timer-controls">
+                    <div class="timer-display-large" id="timerDisplayLarge" aria-live="polite" aria-label="Timer display">00:00:00</div>
+                    <div class="timer-buttons">
+                        <button id="timerBtnLarge" onclick="toggleTimer()" class="btn-timer" aria-label="Start or stop timer">▶️ Start</button>
+                        <button onclick="resetTimer()" class="btn-secondary" aria-label="Reset timer">🔄 Reset</button>
+                    </div>
+                    <div class="timer-matter-select">
+                        <label for="timerMatter">Matter:</label>
+                        <select id="timerMatter" aria-label="Select matter for time tracking">
+                            <option value="">Select a matter</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="time-entries">
+                <h3>Time Entries</h3>
+                <div id="timeEntriesList" class="time-list" role="region" aria-label="Time entries list">
+                    <p class="empty-state">No time entries recorded</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- BILLING SECTION -->
+        <section id="billing" class="main-section" role="main" aria-label="Billing & Invoicing">
+            <div class="section-header">
+                <h1>Billing & Invoicing</h1>
+                <button class="btn-primary" onclick="generateInvoice()" aria-label="Generate new invoice">+ New Invoice</button>
+            </div>
+            
+            <!-- User Level Configuration -->
+            <div class="billing-config" role="region" aria-label="Billing configuration">
+                <h3>User Configuration</h3>
+                <div class="user-level-select">
+                    <label for="userLevel">Your level:</label>
+                    <select id="userLevel" onchange="updateUserRate()" aria-label="Select your professional level">
+                        <option value="collaborateur">Associate (250€/h)</option>
+                        <option value="associe">Partner (500€/h)</option>
+                    </select>
+                    <span id="currentRate" aria-live="polite">Current rate: 250€/h</span>
+                </div>
+            </div>
+            
+            <!-- Invoice Generation Form -->
+            <div id="invoiceForm" class="form-container" style="display: none;" role="form" aria-label="Invoice generation form">
+                <h3>New Invoice</h3>
+                <form onsubmit="createInvoice(event)" novalidate>
+                    <div class="invoice-header">
+                        <div class="form-row">
+                            <label for="invoiceClient" class="sr-only">Client Name</label>
+                            <input type="text" id="invoiceClient" placeholder="Client name" required aria-required="true">
+                            
+                            <label for="invoiceDate" class="sr-only">Invoice Date</label>
+                            <input type="date" id="invoiceDate" required aria-required="true" aria-label="Invoice date">
+                        </div>
+                        <div class="form-row">
+                            <label for="invoiceCurrency" class="sr-only">Currency</label>
+                            <select id="invoiceCurrency" aria-label="Select currency">
+                                <option value="EUR">EUR (€)</option>
+                                <option value="USD">USD ($)</option>
+                                <option value="GBP">GBP (£)</option>
+                            </select>
+                            
+                            <label for="invoiceNumber" class="sr-only">Invoice Number</label>
+                            <input type="text" id="invoiceNumber" placeholder="Invoice number" required aria-required="true">
+                        </div>
+                    </div>
+                    
+                    <div class="time-entries-selection">
+                        <h4>Select Time Entries:</h4>
+                        <div id="billableTimeEntries" class="billable-entries" role="region" aria-label="Billable time entries">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="invoice-summary" role="region" aria-label="Invoice summary">
+                        <div class="summary-row">
+                            <span>Total Hours:</span>
+                            <span id="totalHoursBilling" aria-live="polite">0.0h</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span id="totalAmountHT" aria-live="polite">0€</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>VAT (20%):</span>
+                            <span id="totalVAT" aria-live="polite">0€</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total:</span>
+                            <span id="totalAmountTTC" aria-live="polite">0€</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Generate Invoice PDF</button>
+                        <button type="button" class="btn-secondary" onclick="hideInvoiceForm()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Generated Invoices List -->
+            <div class="invoices-section">
+                <h3>Generated Invoices</h3>
+                <div id="invoicesList" class="invoices-list" role="region" aria-label="Generated invoices list">
+                    <p class="empty-state">No invoices generated yet</p>
+                </div>
+            </div>
+            
+            <!-- Export Section -->
+            <div class="export-section">
+                <h3>Accounting Export</h3>
+                <div class="export-controls">
+                    <label for="exportMonth" class="sr-only">Export Month</label>
+                    <input type="month" id="exportMonth" value="" aria-label="Select month to export">
+                    <button class="btn-secondary" onclick="exportAccounting()" aria-label="Export to Excel">Export Excel</button>
+                    <button class="btn-secondary" onclick="exportCSV()" aria-label="Export to CSV">Export CSV</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- DOCUMENTS SECTION -->
+        <section id="documents" class="main-section" role="main" aria-label="Document Management">
+            <div class="section-header">
+                <h1>Document Management</h1>
+                <button class="btn-primary" onclick="showUploadForm()" aria-label="Upload new document">+ Upload Document</button>
+            </div>
+            
+            <!-- Enhanced Upload Form -->
+            <div id="uploadForm" class="form-container" style="display: none;" role="form" aria-label="Document upload form">
+                <h3>📁 New Document</h3>
+                
+                <!-- Enhanced Drag & Drop Zone -->
+                <div class="upload-zone">
+                    <div class="upload-area" id="uploadArea" role="button" tabindex="0" aria-label="Click or drag files to upload">
+                        <div class="upload-content">
+                            <div class="upload-icon" aria-hidden="true">📎</div>
+                            <div class="upload-text">
+                                <h4>Drag your files here</h4>
+                                <p id="uploadStatus">or click to select</p>
+                                <small>Supported formats: PDF, DOC, DOCX, TXT, JPG, PNG, XLS, XLSX</small>
+                            </div>
+                        </div>
+                        <input type="file" id="documentFile" multiple 
+                               accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.xls,.xlsx"
+                               aria-label="Select files to upload">
+                    </div>
+                    
+                    <!-- Upload Progress -->
+                    <div class="upload-progress" id="uploadProgress" style="display: none;" role="progressbar" aria-label="Upload progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <span class="progress-text" id="progressText" aria-live="polite">0%</span>
+                    </div>
+                </div>
+                
+                <!-- Document Details Form -->
+                <form onsubmit="uploadDocument(event)" id="documentUploadForm" novalidate>
+                    <div class="document-details">
+                        <div class="form-group">
+                            <label for="documentMatter">Associated Matter:</label>
+                            <select id="documentMatter" required aria-required="true">
+                                <option value="">Select a matter</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="documentType">Document Type:</label>
+                            <select id="documentType" required aria-required="true">
+                                <option value="contract">📄 Contract</option>
+                                <option value="duediligence">🔍 Due Diligence</option>
+                                <option value="correspondence">✉️ Correspondence</option>
+                                <option value="opinion">⚖️ Legal Opinion</option>
+                                <option value="note">📝 Note</option>
+                                <option value="other">📋 Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="documentDescription">Description (optional):</label>
+                            <textarea id="documentDescription" 
+                                    placeholder="Document description" 
+                                    rows="3"
+                                    aria-describedby="description-help"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary" id="submitUpload" disabled>
+                            <span class="btn-icon" aria-hidden="true">📤</span>
+                            Upload Document(s)
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="hideUploadForm()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Documents Filter & Search -->
+            <div class="documents-filter" role="search" aria-label="Filter and search documents">
+                <div class="filter-group">
+                    <label for="filterMatter">Matter:</label>
+                    <select id="filterMatter" onchange="filterDocuments()" aria-label="Filter by matter">
+                        <option value="">All matters</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filterType">Type:</label>
+                    <select id="filterType" onchange="filterDocuments()" aria-label="Filter by document type">
+                        <option value="">All types</option>
+                        <option value="contract">Contracts</option>
+                        <option value="duediligence">Due Diligence</option>
+                        <option value="correspondence">Correspondence</option>
+                        <option value="opinion">Legal Opinions</option>
+                        <option value="note">Notes</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group search-group">
+                    <label for="searchDocuments">Search:</label>
+                    <input type="search" 
+                           id="searchDocuments" 
+                           placeholder="Search documents..." 
+                           onkeyup="filterDocuments()"
+                           aria-label="Search documents">
+                </div>
+            </div>
+            
+            <!-- Documents List -->
+            <div class="documents-container">
+                <div id="documentsList" class="documents-grid" role="region" aria-label="Documents list">
+                    <p class="empty-state">No documents uploaded yet</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ANALYTICS SECTION -->
+        <section id="analytics" class="main-section" role="main" aria-label="Analytics & Reporting">
+            <div class="section-header">
+                <h1>Analytics & Reporting</h1>
+                <div class="period-selector">
+                    <label for="analyticsPeriod" class="sr-only">Select analysis period</label>
+                    <select id="analyticsPeriod" onchange="updateAnalytics()" aria-label="Select analysis period">
+                        <option value="month">This Month</option>
+                        <option value="quarter">This Quarter</option>
+                        <option value="year">This Year</option>
+                        <option value="all">All Time</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- KPIs Row -->
+            <div class="analytics-kpis" role="region" aria-label="Key performance indicators">
+                <div class="kpi-card">
+                    <h3 id="kpiRevenue" aria-label="Total revenue">0€</h3>
+                    <p>Revenue</p>
+                    <span id="kpiRevenueChange" class="kpi-change" aria-label="Revenue change">+0%</span>
+                </div>
+                <div class="kpi-card">
+                    <h3 id="kpiHours" aria-label="Billable hours">0h</h3>
+                    <p>Billable Hours</p>
+                    <span id="kpiHoursChange" class="kpi-change" aria-label="Hours change">+0%</span>
+                </div>
+                <div class="kpi-card">
+                    <h3 id="kpiRate" aria-label="Average rate">0€</h3>
+                    <p>Average Rate</p>
+                    <span id="kpiRateChange" class="kpi-change" aria-label="Rate change">+0%</span>
+                </div>
+                <div class="kpi-card">
+                    <h3 id="kpiUtilization" aria-label="Utilization rate">0%</h3>
+                    <p>Utilization Rate</p>
+                    <span id="kpiUtilizationChange" class="kpi-change" aria-label="Utilization change">+0%</span>
+                </div>
+            </div>
+            
+            <!-- Charts Row -->
+            <div class="analytics-charts">
+                <div class="chart-container">
+                    <h3>📈 Revenue Evolution</h3>
+                    <canvas id="revenueChart" width="400" height="200" aria-label="Revenue chart"></canvas>
+                </div>
+                
+                <div class="chart-container">
+                    <h3>🥧 Practice Areas Distribution</h3>
+                    <canvas id="practiceChart" width="400" height="200" aria-label="Practice areas distribution chart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Detailed Tables -->
+            <div class="analytics-tables">
+                <div class="table-container">
+                    <h3>Top Clients by Revenue</h3>
+                    <div id="topClientsTable" class="analytics-table" role="region" aria-label="Top clients table"></div>
+                </div>
+                
+                <div class="table-container">
+                    <h3>Matter Profitability</h3>
+                    <div id="matterProfitabilityTable" class="analytics-table" role="region" aria-label="Matter profitability table"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Global Search Modal -->
+    <div class="search-modal" id="globalSearchModal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="searchTitle">
+        <div class="search-overlay">
+            <div class="search-container">
+                <div class="search-header">
+                    <h2 id="searchTitle" class="sr-only">Global Search</h2>
+                    <input type="search" 
+                           id="globalSearchInput" 
+                           placeholder="Global search... (Ctrl+R)" 
+                           autofocus
+                           aria-label="Global search input">
+                    <button onclick="keyboardManager.hideGlobalSearch()" 
+                            class="search-close" 
+                            aria-label="Close search">✕</button>
+                </div>
+                <div class="search-results">
+                    <div id="searchResults" class="search-results-content" role="region" aria-label="Search results">
+                        <p class="search-hint">Type to search in clients, matters, and time entries...</p>
+                    </div>
+                </div>
+                <div class="search-footer">
+                    <span>↑↓ Navigate • Enter Select • Esc Close</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Keyboard Shortcuts Hint -->
+    <aside class="keyboard-hint" id="keyboardHint" role="complementary" aria-label="Keyboard shortcuts">
+        <h4>⌨️ Keyboard Shortcuts 
+            <button onclick="toggleKeyboardHint()" class="hint-close" aria-label="Close shortcuts hint">✕</button>
+        </h4>
+        <ul role="list">
+            <li><span>Global Search</span> <kbd>Ctrl+R</kbd></li>
+            <li><span>Dashboard</span> <kbd>Ctrl+D</kbd></li>
+            <li><span>New Matter</span> <kbd>Ctrl+N</kbd></li>
+            <li><span>Timer</span> <kbd>Ctrl+T</kbd></li>
+            <li><span>Clients</span> <kbd>Alt+C</kbd></li>
+            <li><span>Matters</span> <kbd>Alt+M</kbd></li>
+            <li><span>Documents</span> <kbd>Alt+D</kbd></li>
+            <li><span>Analytics</span> <kbd>Alt+A</kbd></li>
+        </ul>
+    </aside>
+    
+    <!-- Error Display -->
+    <div class="error-display" id="errorDisplay" style="display: none;" role="alert" aria-live="assertive">
+        <div class="error-content">
+            <h4>⚠️ Error</h4>
+            <p id="errorMessage"></p>
+            <button onclick="hideError()" class="btn-secondary">Close</button>
+        </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div class="loading-indicator" id="loadingIndicator" style="display: none;" role="status" aria-label="Loading">
+        <div class="loading-spinner" aria-hidden="true"></div>
+        <span class="loading-text">Loading...</span>
+    </div>
+
+    <!-- Screen Reader Only Content -->
+    <div class="sr-only" id="sr-announcements" aria-live="polite" aria-atomic="true"></div>
+    
+    <!-- Enhanced JavaScript Error Handling -->
+    <script>
+        // Enhanced keyboard hint management
+        function toggleKeyboardHint() {
+            const hint = document.getElementById('keyboardHint');
+            const isVisible = hint.style.display !== 'none';
+            hint.style.display = isVisible ? 'none' : 'block';
+            localStorage.setItem('prometheus_hint_hidden', isVisible);
+        }
+        
+        // Enhanced error display function
+        function showError(message) {
+            const errorDisplay = document.getElementById('errorDisplay');
+            const errorMessage = document.getElementById('errorMessage');
+            if (errorDisplay && errorMessage) {
+                errorMessage.textContent = message;
+                errorDisplay.style.display = 'flex';
+                
+                // Announce to screen readers
+                announceToScreenReader(`Error: ${message}`);
+            }
+        }
+        
+        function hideError() {
+            const errorDisplay = document.getElementById('errorDisplay');
+            if (errorDisplay) {
+                errorDisplay.style.display = 'none';
+            }
+        }
+        
+        // Screen reader announcements
+        function announceToScreenReader(message) {
+            const announcer = document.getElementById('sr-announcements');
+            if (announcer) {
+                announcer.textContent = message;
+                // Clear after announcement
+                setTimeout(() => {
+                    announcer.textContent = '';
+                }, 1000);
+            }
+        }
+        
+        // Loading indicator functions
+        function showLoading() {
+            const loader = document.getElementById('loadingIndicator');
+            if (loader) {
+                loader.style.display = 'flex';
+                announceToScreenReader('Loading content...');
+            }
+        }
+        
+        function hideLoading() {
+            const loader = document.getElementById('loadingIndicator');
+            if (loader) {
+                loader.style.display = 'none';
+            }
+        }
+        
+        // Enhanced auto-hide hint management
+        document.addEventListener('DOMContentLoaded', function() {
+            const hintHidden = localStorage.getItem('prometheus_hint_hidden') === 'true';
+            const hint = document.getElementById('keyboardHint');
+            
+            if (hint) {
+                if (hintHidden) {
+                    hint.style.display = 'none';
+                } else {
+                    // Auto-hide after 10 seconds for new users
+                    setTimeout(() => {
+                        hint.style.opacity = '0.7';
+                        setTimeout(() => {
+                            hint.style.display = 'none';
+                            localStorage.setItem('prometheus_hint_hidden', 'true');
+                        }, 3000);
+                    }, 10000);
+                }
+            }
+        });
+        
+        // Enhanced global error handler
+        window.addEventListener('error', function(event) {
+            if (event.error) {
+                console.error('Global error:', event.error);
+                showError('An unexpected error occurred. Please check the console for details.');
+            }
+        });
+        
+        window.addEventListener('unhandledrejection', function(event) {
+            if (event.reason) {
+                console.error('Unhandled promise rejection:', event.reason);
+                showError('A promise rejection occurred. Please check the console.');
+            }
+        });
+
+        if ('performance' in window) {
+            window.addEventListener('load', function() {
+                setTimeout(() => {
+                    const perf = performance.getEntriesByType('navigation')[0];
+                    if (perf && perf.loadEventEnd > 3000) {
+                        console.warn('Page load time is slow:', perf.loadEventEnd + 'ms');
+                    }
+                }, 0);
+            });
+        }
+    </script>
+    <script src="script-core.js"></script>
+    <script src="script-ui.js"></script>
+    <script src="prometheus-auth-ui.js"></script>
+    <script src="prometheus-auth.js"></script>
+</body>
+</html>
