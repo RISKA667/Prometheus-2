@@ -4,67 +4,266 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Prometheus - Professional Legal Management Software for BOURDON & Associates">
-    <meta name="author" content="BOURDON Conseils">
-    <title>Prometheus - BOURDON Conseils</title>
+    <meta name="author" content="BOURDON & Associates">
+    <meta name="keywords" content="legal, law firm, case management, time tracking, billing">
+    <title>Prometheus - BOURDON & Associates</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <!-- Preload critical resources -->
+    <link rel="preload" href="script-core.js" as="script">
+    <link rel="preload" href="script-ui.js" as="script">
 </head>
 <body>
+    <!-- Skip Links for Accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Main Navigation Bar -->
     <nav class="navbar" role="navigation" aria-label="Main navigation">
         <div class="nav-brand">
-            <h2>Prometheus</h2>
-            <span>BOURDON Conseils</span>
+            <h2>⚖️ Prometheus</h2>
+            <span>BOURDON & Associates</span>
         </div>
+        
         <div class="nav-menu" role="menubar">
-            <button class="nav-btn active" data-section="dashboard" onclick="showSection('dashboard')" role="menuitem" aria-label="Dashboard">Dashboard</button>
-            <button class="nav-btn" data-section="clients" onclick="showSection('clients')" role="menuitem" aria-label="Client Management">Clients</button>
-            <button class="nav-btn" data-section="matters" onclick="showSection('matters')" role="menuitem" aria-label="Matter Management">Matters</button>
-            <button class="nav-btn" data-section="timetracking" onclick="showSection('timetracking')" role="menuitem" aria-label="Time Tracking">Time Tracking</button>
-            <button class="nav-btn" data-section="billing" onclick="showSection('billing')" role="menuitem" aria-label="Billing & Invoicing">Billing</button>
-            <button class="nav-btn" data-section="documents" onclick="showSection('documents')" role="menuitem" aria-label="Document Management">Documents</button>
-            <button class="nav-btn" data-section="analytics" onclick="showSection('analytics')" role="menuitem" aria-label="Analytics & Reporting">Analytics</button>
+            <button class="nav-btn active" 
+                    data-section="dashboard" 
+                    onclick="navigationManager.showSection('dashboard')" 
+                    role="menuitem" 
+                    aria-label="Dashboard">
+                <span class="nav-icon">📊</span>
+                Dashboard
+            </button>
+            
+            <button class="nav-btn" 
+                    data-section="clients" 
+                    onclick="navigationManager.showSection('clients')" 
+                    role="menuitem" 
+                    aria-label="Client Management">
+                <span class="nav-icon">👥</span>
+                Clients
+            </button>
+            
+            <button class="nav-btn" 
+                    data-section="matters" 
+                    onclick="navigationManager.showSection('matters')" 
+                    role="menuitem" 
+                    aria-label="Matter Management">
+                <span class="nav-icon">⚖️</span>
+                Matters
+            </button>
+            
+            <button class="nav-btn" 
+                    data-section="timetracking" 
+                    onclick="navigationManager.showSection('timetracking')" 
+                    role="menuitem" 
+                    aria-label="Time Tracking">
+                <span class="nav-icon">⏱️</span>
+                Time Tracking
+            </button>
+            
+            <button class="nav-btn" 
+                    data-section="billing" 
+                    onclick="navigationManager.showSection('billing')" 
+                    role="menuitem" 
+                    aria-label="Billing & Invoicing">
+                <span class="nav-icon">💰</span>
+                Billing
+            </button>
+            
+            <button class="nav-btn" 
+                    data-section="documents" 
+                    onclick="navigationManager.showSection('documents')" 
+                    role="menuitem" 
+                    aria-label="Document Management">
+                <span class="nav-icon">📁</span>
+                Documents
+            </button>
+            
+            <button class="nav-btn" 
+                    data-section="analytics" 
+                    onclick="navigationManager.showSection('analytics')" 
+                    role="menuitem" 
+                    aria-label="Analytics & Reporting">
+                <span class="nav-icon">📈</span>
+                Analytics
+            </button>
         </div>
+        
+        <!-- Global Search Button -->
+        <button class="nav-search-btn" 
+                onclick="searchManager.toggleGlobalSearch()"
+                aria-label="Global search (Ctrl+R)"
+                title="Global Search (Ctrl+R)">
+            <span class="search-icon">🔍</span>
+        </button>
+        
+        <!-- Timer Widget -->
         <div class="timer-widget" role="region" aria-label="Timer widget">
-            <button id="timerBtn" onclick="toggleTimer()" aria-label="Start or stop timer">▶️ Start Timer</button>
-            <span id="timerDisplay" aria-live="polite" aria-label="Current timer">00:00:00</span>
+            <button id="timerBtn" 
+                    onclick="timeTracker.toggleTimer()" 
+                    aria-label="Start or stop timer"
+                    class="timer-btn">
+                <span class="timer-icon">▶️</span>
+                <span class="timer-text">Start Timer</span>
+            </button>
+            <span id="timerDisplay" 
+                  aria-live="polite" 
+                  aria-label="Current timer"
+                  class="timer-display">00:00:00</span>
         </div>
     </nav>
-    <main>
+
+    <!-- Main Content Area -->
+    <main id="main-content">
+        
+        <!-- DASHBOARD SECTION -->
         <section id="dashboard" class="main-section active" role="main" aria-label="Dashboard">
-            <div class="dashboard-header">
-                <h1>Dashboard</h1>
-                <div class="quick-stats" role="region" aria-label="Quick statistics">
-                    <div class="stat-card">
+            <header class="section-header">
+                <h1>Dashboard Overview</h1>
+                <div class="header-actions">
+                    <button class="btn-secondary" onclick="dataManager.refreshData()">
+                        <span class="btn-icon">🔄</span>
+                        Refresh Data
+                    </button>
+                </div>
+            </header>
+            
+            <!-- Quick Statistics Cards -->
+            <div class="quick-stats" role="region" aria-label="Quick statistics">
+                <div class="stat-card" data-metric="clients">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-content">
                         <h3 id="totalClients" aria-label="Total clients">0</h3>
-                        <p>Clients</p>
+                        <p>Active Clients</p>
+                        <span class="stat-change" id="clientsChange">+0%</span>
                     </div>
-                    <div class="stat-card">
+                </div>
+                
+                <div class="stat-card" data-metric="matters">
+                    <div class="stat-icon">⚖️</div>
+                    <div class="stat-content">
                         <h3 id="totalMatters" aria-label="Total matters">0</h3>
-                        <p>Matters</p>
+                        <p>Open Matters</p>
+                        <span class="stat-change" id="mattersChange">+0%</span>
                     </div>
-                    <div class="stat-card">
+                </div>
+                
+                <div class="stat-card" data-metric="hours">
+                    <div class="stat-icon">⏱️</div>
+                    <div class="stat-content">
                         <h3 id="totalHours" aria-label="Total hours this month">0.0</h3>
-                        <p>Hours (Month)</p>
+                        <p>Hours (This Month)</p>
+                        <span class="stat-change" id="hoursChange">+0%</span>
                     </div>
-                    <div class="stat-card">
-                        <h3 id="totalRevenue" aria-label="Estimated revenue">0€</h3>
+                </div>
+                
+                <div class="stat-card" data-metric="revenue">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-content">
+                        <h3 id="totalRevenue" aria-label="Estimated revenue">$0</h3>
                         <p>Estimated Revenue</p>
+                        <span class="stat-change" id="revenueChange">+0%</span>
                     </div>
                 </div>
             </div>
             
-            <div class="dashboard-content">
-                <div class="recent-matters">
-                    <h3>Recent Matters</h3>
-                    <div id="recentMattersList" class="matters-list" role="region" aria-label="Recent matters list">
-                        <p class="empty-state">No matters created yet</p>
+            <!-- Dashboard Content Grid -->
+            <div class="dashboard-grid">
+                <!-- Recent Matters Widget -->
+                <div class="dashboard-widget">
+                    <header class="widget-header">
+                        <h3>Recent Matters</h3>
+                        <button class="btn-link" onclick="navigationManager.showSection('matters')">
+                            View All
+                        </button>
+                    </header>
+                    <div id="recentMattersList" class="widget-content" role="region" aria-label="Recent matters list">
+                        <div class="empty-state">
+                            <div class="empty-icon">⚖️</div>
+                            <p>No matters created yet</p>
+                            <button class="btn-primary btn-sm" onclick="matterManager.showCreateForm()">
+                                Create First Matter
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="recent-time">
-                    <h3>Today's Time</h3>
-                    <div id="todayTimeList" class="time-list" role="region" aria-label="Today's time entries">
-                        <p class="empty-state">No time entries recorded</p>
+                <!-- Today's Time Entries Widget -->
+                <div class="dashboard-widget">
+                    <header class="widget-header">
+                        <h3>Today's Time</h3>
+                        <button class="btn-link" onclick="navigationManager.showSection('timetracking')">
+                            View All
+                        </button>
+                    </header>
+                    <div id="todayTimeList" class="widget-content" role="region" aria-label="Today's time entries">
+                        <div class="empty-state">
+                            <div class="empty-icon">⏱️</div>
+                            <p>No time entries recorded today</p>
+                            <button class="btn-primary btn-sm" onclick="timeTracker.startTimer()">
+                                Start Timer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Activities Widget -->
+                <div class="dashboard-widget">
+                    <header class="widget-header">
+                        <h3>Recent Activity</h3>
+                        <div class="activity-filters">
+                            <select id="activityFilter" onchange="dashboardManager.filterActivities()">
+                                <option value="all">All Activities</option>
+                                <option value="matters">Matters</option>
+                                <option value="time">Time Entries</option>
+                                <option value="documents">Documents</option>
+                                <option value="billing">Billing</option>
+                            </select>
+                        </div>
+                    </header>
+                    <div id="recentActivitiesList" class="widget-content activity-feed" role="region" aria-label="Recent activities">
+                        <div class="empty-state">
+                            <div class="empty-icon">📋</div>
+                            <p>No recent activities</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions Widget -->
+                <div class="dashboard-widget">
+                    <header class="widget-header">
+                        <h3>Quick Actions</h3>
+                    </header>
+                    <div class="widget-content quick-actions-grid">
+                        <button class="quick-action-btn" onclick="clientManager.showCreateForm()">
+                            <span class="action-icon">👥</span>
+                            <span class="action-label">New Client</span>
+                        </button>
+                        
+                        <button class="quick-action-btn" onclick="matterManager.showCreateForm()">
+                            <span class="action-icon">⚖️</span>
+                            <span class="action-label">New Matter</span>
+                        </button>
+                        
+                        <button class="quick-action-btn" onclick="timeTracker.startTimer()">
+                            <span class="action-icon">⏱️</span>
+                            <span class="action-label">Start Timer</span>
+                        </button>
+                        
+                        <button class="quick-action-btn" onclick="billingManager.generateInvoice()">
+                            <span class="action-icon">💰</span>
+                            <span class="action-label">New Invoice</span>
+                        </button>
+                        
+                        <button class="quick-action-btn" onclick="documentManager.showUploadForm()">
+                            <span class="action-icon">📁</span>
+                            <span class="action-label">Upload Document</span>
+                        </button>
+                        
+                        <button class="quick-action-btn" onclick="searchManager.showGlobalSearch()">
+                            <span class="action-icon">🔍</span>
+                            <span class="action-label">Global Search</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -72,55 +271,139 @@
 
         <!-- CLIENTS SECTION -->
         <section id="clients" class="main-section" role="main" aria-label="Client Management">
-            <div class="section-header">
+            <header class="section-header">
                 <h1>Client Management</h1>
-                <button class="btn-primary" onclick="showAddClientForm()" aria-label="Add new client">+ New Client</button>
-            </div>
-            
-            <div id="addClientForm" class="form-container" style="display: none;" role="form" aria-label="Add new client form">
-                <h3>New Client</h3>
-                <form onsubmit="addClient(event)" novalidate>
-                    <label for="clientName" class="sr-only">Client Name</label>
-                    <input type="text" id="clientName" placeholder="Client name" required aria-required="true">
-                    
-                    <label for="clientContact" class="sr-only">Primary Contact</label>
-                    <input type="text" id="clientContact" placeholder="Primary contact" aria-describedby="contact-help">
-                    
-                    <label for="clientEmail" class="sr-only">Email Address</label>
-                    <input type="email" id="clientEmail" placeholder="Email address" aria-describedby="email-help">
-                    
-                    <label for="clientTier" class="sr-only">Client Tier</label>
-                    <select id="clientTier" aria-label="Select client tier">
+                <div class="header-actions">
+                    <div class="search-bar">
+                        <input type="search" 
+                               id="clientSearch" 
+                               placeholder="Search clients..." 
+                               onkeyup="clientManager.filterClients()"
+                               aria-label="Search clients">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                    <select id="clientTierFilter" onchange="clientManager.filterClients()">
+                        <option value="">All Tiers</option>
                         <option value="Tier 1">Tier 1 - Premium</option>
                         <option value="Tier 2">Tier 2 - Standard</option>
                         <option value="Tier 3">Tier 3 - Basic</option>
                     </select>
+                    <button class="btn-primary" onclick="clientManager.showCreateForm()" aria-label="Add new client">
+                        <span class="btn-icon">+</span>
+                        New Client
+                    </button>
+                </div>
+            </header>
+            
+            <!-- Client Creation/Edit Form -->
+            <div id="clientForm" class="form-container" style="display: none;" role="form" aria-label="Client form">
+                <header class="form-header">
+                    <h3 id="clientFormTitle">New Client</h3>
+                    <button class="form-close" onclick="clientManager.hideForm()" aria-label="Close form">✕</button>
+                </header>
+                
+                <form onsubmit="clientManager.submitForm(event)" novalidate class="modern-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="clientName">Client Name *</label>
+                            <input type="text" 
+                                   id="clientName" 
+                                   placeholder="Enter client name" 
+                                   required 
+                                   aria-required="true"
+                                   autocomplete="organization">
+                            <span class="field-error" id="clientNameError"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="clientTier">Client Tier</label>
+                            <select id="clientTier" aria-label="Select client tier">
+                                <option value="Tier 1">Tier 1 - Premium Client</option>
+                                <option value="Tier 2" selected>Tier 2 - Standard Client</option>
+                                <option value="Tier 3">Tier 3 - Basic Client</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="clientContact">Primary Contact</label>
+                            <input type="text" 
+                                   id="clientContact" 
+                                   placeholder="Contact person name"
+                                   autocomplete="name">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="clientEmail">Email Address</label>
+                            <input type="email" 
+                                   id="clientEmail" 
+                                   placeholder="contact@client.com"
+                                   autocomplete="email">
+                            <span class="field-error" id="clientEmailError"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="clientPhone">Phone Number</label>
+                            <input type="tel" 
+                                   id="clientPhone" 
+                                   placeholder="+1 (555) 123-4567"
+                                   autocomplete="tel">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="clientAddress">Address</label>
+                            <textarea id="clientAddress" 
+                                      placeholder="Client address" 
+                                      rows="3"
+                                      autocomplete="street-address"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="clientNotes">Internal Notes</label>
+                        <textarea id="clientNotes" 
+                                  placeholder="Internal notes about this client..." 
+                                  rows="4"></textarea>
+                    </div>
                     
                     <div class="form-actions">
-                        <button type="submit" class="btn-primary">Create Client</button>
-                        <button type="button" class="btn-secondary" onclick="hideAddClientForm()">Cancel</button>
+                        <button type="submit" class="btn-primary" id="clientSubmitBtn">
+                            <span class="btn-icon">💾</span>
+                            <span class="btn-text">Create Client</span>
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="clientManager.hideForm()">
+                            Cancel
+                        </button>
                     </div>
                 </form>
             </div>
             
-            <div id="clientsList" class="clients-list" role="region" aria-label="Clients list">
-                <p class="empty-state">No clients created yet</p>
+            <!-- Clients List -->
+            <div class="content-container">
+                <div id="clientsList" class="clients-grid" role="region" aria-label="Clients list">
+                    <!-- Clients will be loaded here by JavaScript -->
+                    <div class="loading-placeholder">
+                        <div class="loading-spinner"></div>
+                        <p>Loading clients...</p>
+                    </div>
+                </div>
             </div>
         </section>
 
         <!-- MATTERS SECTION -->
         <section id="matters" class="main-section" role="main" aria-label="Matter Management">
-            <div class="section-header">
+            <header class="section-header">
                 <h1>Matter Management</h1>
-                <button class="btn-primary" onclick="showAddMatterForm()" aria-label="Add new matter">+ New Matter</button>
-            </div>
-            
-            <div id="addMatterForm" class="form-container" style="display: none;" role="form" aria-label="Add new matter form">
-                <h3>New Matter</h3>
-                <form onsubmit="addMatter(event)" novalidate>
-                    <label for="matterPractice" class="sr-only">Practice Area</label>
-                    <select id="matterPractice" required aria-required="true" aria-label="Select practice area">
-                        <option value="">Select Practice Area</option>
+                <div class="header-actions">
+                    <div class="search-bar">
+                        <input type="search" 
+                               id="matterSearch" 
+                               placeholder="Search matters..." 
+                               onkeyup="matterManager.filterMatters()"
+                               aria-label="Search matters">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                    <select id="practiceAreaFilter" onchange="matterManager.filterMatters()">
+                        <option value="">All Practice Areas</option>
                         <option value="MA">MA - Mergers & Acquisitions</option>
                         <option value="CP">CP - Corporate</option>
                         <option value="LTG">LTG - Litigation</option>
@@ -131,337 +414,850 @@
                         <option value="PL">PL - Private Laws</option>
                         <option value="IP">IP - Intellectual Property</option>
                     </select>
-                    
-                    <label for="matterClient" class="sr-only">Client</label>
-                    <select id="matterClient" required aria-required="true" aria-label="Select client">
-                        <option value="">Select Client</option>
+                    <select id="matterStatusFilter" onchange="matterManager.filterMatters()">
+                        <option value="">All Statuses</option>
+                        <option value="Active">Active</option>
+                        <option value="On Hold">On Hold</option>
+                        <option value="Closed">Closed</option>
                     </select>
+                    <button class="btn-primary" onclick="matterManager.showCreateForm()" aria-label="Add new matter">
+                        <span class="btn-icon">+</span>
+                        New Matter
+                    </button>
+                </div>
+            </header>
+            
+            <!-- Matter Creation/Edit Form -->
+            <div id="matterForm" class="form-container" style="display: none;" role="form" aria-label="Matter form">
+                <header class="form-header">
+                    <h3 id="matterFormTitle">New Matter</h3>
+                    <button class="form-close" onclick="matterManager.hideForm()" aria-label="Close form">✕</button>
+                </header>
+                
+                <form onsubmit="matterManager.submitForm(event)" novalidate class="modern-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="matterPractice">Practice Area *</label>
+                            <select id="matterPractice" required aria-required="true">
+                                <option value="">Select Practice Area</option>
+                                <option value="MA">MA - Mergers & Acquisitions</option>
+                                <option value="CP">CP - Corporate</option>
+                                <option value="LTG">LTG - Litigation</option>
+                                <option value="LT">LT - Legal & Tax</option>
+                                <option value="BK">BK - Banking</option>
+                                <option value="MT">MT - Monetary</option>
+                                <option value="FM">FM - Financial Market</option>
+                                <option value="PL">PL - Private Laws</option>
+                                <option value="IP">IP - Intellectual Property</option>
+                            </select>
+                            <span class="field-error" id="matterPracticeError"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="matterClient">Client *</label>
+                            <select id="matterClient" required aria-required="true">
+                                <option value="">Select Client</option>
+                                <!-- Populated by JavaScript -->
+                            </select>
+                            <span class="field-error" id="matterClientError"></span>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="matterTitle">Matter Title *</label>
+                            <input type="text" 
+                                   id="matterTitle" 
+                                   placeholder="Enter matter title" 
+                                   required 
+                                   aria-required="true">
+                            <span class="field-error" id="matterTitleError"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="matterStatus">Status</label>
+                            <select id="matterStatus">
+                                <option value="Active" selected>Active</option>
+                                <option value="On Hold">On Hold</option>
+                                <option value="Closed">Closed</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="matterBudget">Estimated Budget</label>
+                            <div class="input-with-prefix">
+                                <span class="input-prefix">$</span>
+                                <input type="number" 
+                                       id="matterBudget" 
+                                       placeholder="0.00" 
+                                       min="0" 
+                                       step="0.01">
+                            </div>
+                        </div>
+                    </div>
                     
-                    <label for="matterTitle" class="sr-only">Matter Title</label>
-                    <input type="text" id="matterTitle" placeholder="Matter title" required aria-required="true">
-                    
-                    <label for="matterDescription" class="sr-only">Matter Description</label>
-                    <textarea id="matterDescription" placeholder="Matter description" rows="4" aria-describedby="description-help"></textarea>
+                    <div class="form-group">
+                        <label for="matterDescription">Description</label>
+                        <textarea id="matterDescription" 
+                                  placeholder="Detailed description of the matter..." 
+                                  rows="6"></textarea>
+                    </div>
                     
                     <div class="form-actions">
-                        <button type="submit" class="btn-primary">Create Matter</button>
-                        <button type="button" class="btn-secondary" onclick="hideAddMatterForm()">Cancel</button>
+                        <button type="submit" class="btn-primary" id="matterSubmitBtn">
+                            <span class="btn-icon">💾</span>
+                            <span class="btn-text">Create Matter</span>
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="matterManager.hideForm()">
+                            Cancel
+                        </button>
                     </div>
                 </form>
             </div>
             
-            <div id="mattersList" class="matters-list" role="region" aria-label="Matters list">
-                <p class="empty-state">No matters created yet</p>
+            <!-- Matters List -->
+            <div class="content-container">
+                <div id="mattersList" class="matters-grid" role="region" aria-label="Matters list">
+                    <!-- Matters will be loaded here by JavaScript -->
+                    <div class="loading-placeholder">
+                        <div class="loading-spinner"></div>
+                        <p>Loading matters...</p>
+                    </div>
+                </div>
             </div>
         </section>
 
         <!-- TIME TRACKING SECTION -->
         <section id="timetracking" class="main-section" role="main" aria-label="Time Tracking">
-            <div class="section-header">
+            <header class="section-header">
                 <h1>Time Tracking</h1>
-            </div>
+                <div class="header-actions">
+                    <select id="timeFilterPeriod" onchange="timeTracker.filterEntries()">
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month" selected>This Month</option>
+                        <option value="all">All Time</option>
+                    </select>
+                    <button class="btn-secondary" onclick="timeTracker.exportTimesheet()">
+                        <span class="btn-icon">📊</span>
+                        Export Timesheet
+                    </button>
+                </div>
+            </header>
             
+            <!-- Timer Interface -->
             <div class="timer-section" role="region" aria-label="Timer controls">
-                <div class="timer-controls">
-                    <div class="timer-display-large" id="timerDisplayLarge" aria-live="polite" aria-label="Timer display">00:00:00</div>
-                    <div class="timer-buttons">
-                        <button id="timerBtnLarge" onclick="toggleTimer()" class="btn-timer" aria-label="Start or stop timer">▶️ Start</button>
-                        <button onclick="resetTimer()" class="btn-secondary" aria-label="Reset timer">🔄 Reset</button>
+                <div class="timer-container">
+                    <div class="timer-display-large" id="timerDisplayLarge" aria-live="polite" aria-label="Timer display">
+                        00:00:00
                     </div>
-                    <div class="timer-matter-select">
-                        <label for="timerMatter">Matter:</label>
+                    
+                    <div class="timer-controls">
+                        <button id="timerBtnLarge" 
+                                onclick="timeTracker.toggleTimer()" 
+                                class="btn-timer" 
+                                aria-label="Start or stop timer">
+                            <span class="timer-icon">▶️</span>
+                            <span class="timer-text">Start Timer</span>
+                        </button>
+                        
+                        <button onclick="timeTracker.pauseTimer()" 
+                                class="btn-secondary" 
+                                aria-label="Pause timer"
+                                id="pauseTimerBtn"
+                                style="display: none;">
+                            <span class="btn-icon">⏸️</span>
+                            Pause
+                        </button>
+                        
+                        <button onclick="timeTracker.resetTimer()" 
+                                class="btn-secondary" 
+                                aria-label="Reset timer">
+                            <span class="btn-icon">🔄</span>
+                            Reset
+                        </button>
+                    </div>
+                    
+                    <div class="timer-matter-selection">
+                        <label for="timerMatter">Active Matter:</label>
                         <select id="timerMatter" aria-label="Select matter for time tracking">
                             <option value="">Select a matter</option>
+                            <!-- Populated by JavaScript -->
                         </select>
+                        <button class="btn-link" onclick="matterManager.showCreateForm()">
+                            Create New Matter
+                        </button>
+                    </div>
+                    
+                    <div class="timer-description">
+                        <label for="timerDescription">Work Description:</label>
+                        <textarea id="timerDescription" 
+                                  placeholder="What are you working on?" 
+                                  rows="2"></textarea>
                     </div>
                 </div>
             </div>
             
-            <div class="time-entries">
-                <h3>Time Entries</h3>
-                <div id="timeEntriesList" class="time-list" role="region" aria-label="Time entries list">
-                    <p class="empty-state">No time entries recorded</p>
+            <!-- Time Entries List -->
+            <div class="time-entries-section">
+                <header class="subsection-header">
+                    <h3>Time Entries</h3>
+                    <div class="time-summary">
+                        <div class="summary-stat">
+                            <span class="stat-label">Today:</span>
+                            <span class="stat-value" id="todayHours">0.0h</span>
+                        </div>
+                        <div class="summary-stat">
+                            <span class="stat-label">This Week:</span>
+                            <span class="stat-value" id="weekHours">0.0h</span>
+                        </div>
+                        <div class="summary-stat">
+                            <span class="stat-label">This Month:</span>
+                            <span class="stat-value" id="monthHours">0.0h</span>
+                        </div>
+                    </div>
+                </header>
+                
+                <div id="timeEntriesList" class="time-entries-grid" role="region" aria-label="Time entries list">
+                    <!-- Time entries will be loaded here by JavaScript -->
+                    <div class="empty-state">
+                        <div class="empty-icon">⏱️</div>
+                        <p>No time entries recorded</p>
+                        <button class="btn-primary btn-sm" onclick="timeTracker.startTimer()">
+                            Start Your First Timer
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- BILLING SECTION -->
         <section id="billing" class="main-section" role="main" aria-label="Billing & Invoicing">
-            <div class="section-header">
+            <header class="section-header">
                 <h1>Billing & Invoicing</h1>
-                <button class="btn-primary" onclick="generateInvoice()" aria-label="Generate new invoice">+ New Invoice</button>
-            </div>
+                <div class="header-actions">
+                    <div class="billing-summary">
+                        <div class="summary-stat">
+                            <span class="stat-label">Unbilled Hours:</span>
+                            <span class="stat-value" id="unbilledHours">0.0h</span>
+                        </div>
+                        <div class="summary-stat">
+                            <span class="stat-label">Unbilled Amount:</span>
+                            <span class="stat-value" id="unbilledAmount">$0</span>
+                        </div>
+                    </div>
+                    <button class="btn-primary" onclick="billingManager.generateInvoice()" aria-label="Generate new invoice">
+                        <span class="btn-icon">+</span>
+                        New Invoice
+                    </button>
+                </div>
+            </header>
             
-            <!-- User Level Configuration -->
-            <div class="billing-config" role="region" aria-label="Billing configuration">
-                <h3>User Configuration</h3>
-                <div class="user-level-select">
-                    <label for="userLevel">Your level:</label>
-                    <select id="userLevel" onchange="updateUserRate()" aria-label="Select your professional level">
-                        <option value="collaborateur">Associate (250€/h)</option>
-                        <option value="associe">Partner (500€/h)</option>
-                    </select>
-                    <span id="currentRate" aria-live="polite">Current rate: 250€/h</span>
+            <!-- User Rate Configuration -->
+            <div class="billing-config-section">
+                <div class="config-card">
+                    <h3>Rate Configuration</h3>
+                    <div class="rate-settings">
+                        <div class="form-group">
+                            <label for="userLevel">Your Professional Level:</label>
+                            <select id="userLevel" onchange="billingManager.updateUserRate()">
+                                <option value="intern">Intern ($50/hour)</option>
+                                <option value="assistant">Legal Assistant ($150/hour)</option>
+                                <option value="associate" selected>Associate ($250/hour)</option>
+                                <option value="partner">Partner ($500/hour)</option>
+                                <option value="founding_partner">Founding Partner ($750/hour)</option>
+                            </select>
+                        </div>
+                        <div class="current-rate-display">
+                            <span id="currentRate" aria-live="polite">Current rate: $250/hour</span>
+                        </div>
+                    </div>
                 </div>
             </div>
             
             <!-- Invoice Generation Form -->
-            <div id="invoiceForm" class="form-container" style="display: none;" role="form" aria-label="Invoice generation form">
-                <h3>New Invoice</h3>
-                <form onsubmit="createInvoice(event)" novalidate>
-                    <div class="invoice-header">
-                        <div class="form-row">
-                            <label for="invoiceClient" class="sr-only">Client Name</label>
-                            <input type="text" id="invoiceClient" placeholder="Client name" required aria-required="true">
-                            
-                            <label for="invoiceDate" class="sr-only">Invoice Date</label>
-                            <input type="date" id="invoiceDate" required aria-required="true" aria-label="Invoice date">
+            <div id="invoiceForm" class="form-container large" style="display: none;" role="form" aria-label="Invoice generation form">
+                <header class="form-header">
+                    <h3>Generate Invoice</h3>
+                    <button class="form-close" onclick="billingManager.hideInvoiceForm()" aria-label="Close form">✕</button>
+                </header>
+                
+                <form onsubmit="billingManager.createInvoice(event)" novalidate class="modern-form">
+                    <div class="invoice-form-grid">
+                        <!-- Invoice Header -->
+                        <div class="form-section">
+                            <h4>Invoice Details</h4>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="invoiceNumber">Invoice Number *</label>
+                                    <input type="text" 
+                                           id="invoiceNumber" 
+                                           required 
+                                           aria-required="true"
+                                           readonly>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="invoiceDate">Invoice Date *</label>
+                                    <input type="date" 
+                                           id="invoiceDate" 
+                                           required 
+                                           aria-required="true">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="invoiceDueDate">Due Date</label>
+                                    <input type="date" 
+                                           id="invoiceDueDate">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="invoiceCurrency">Currency</label>
+                                    <select id="invoiceCurrency">
+                                        <option value="USD" selected>USD ($)</option>
+                                        <option value="EUR">EUR (€)</option>
+                                        <option value="GBP">GBP (£)</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-row">
-                            <label for="invoiceCurrency" class="sr-only">Currency</label>
-                            <select id="invoiceCurrency" aria-label="Select currency">
-                                <option value="EUR">EUR (€)</option>
-                                <option value="USD">USD ($)</option>
-                                <option value="GBP">GBP (£)</option>
-                            </select>
+                        
+                        <!-- Client Information -->
+                        <div class="form-section">
+                            <h4>Bill To</h4>
+                            <div class="form-group">
+                                <label for="invoiceClientSelect">Select Client *</label>
+                                <select id="invoiceClientSelect" 
+                                        required 
+                                        aria-required="true"
+                                        onchange="billingManager.loadClientDetails()">
+                                    <option value="">Select a client</option>
+                                    <!-- Populated by JavaScript -->
+                                </select>
+                            </div>
                             
-                            <label for="invoiceNumber" class="sr-only">Invoice Number</label>
-                            <input type="text" id="invoiceNumber" placeholder="Invoice number" required aria-required="true">
+                            <div class="client-details" id="invoiceClientDetails" style="display: none;">
+                                <div class="form-group">
+                                    <label for="invoiceClientName">Client Name</label>
+                                    <input type="text" id="invoiceClientName" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label for="invoiceClientAddress">Billing Address</label>
+                                    <textarea id="invoiceClientAddress" rows="3"></textarea>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="time-entries-selection">
-                        <h4>Select Time Entries:</h4>
+                    <!-- Time Entries Selection -->
+                    <div class="form-section">
+                        <h4>Select Time Entries to Bill</h4>
+                        <div class="time-entries-filter">
+                            <select id="timeEntriesFilter" onchange="billingManager.filterBillableEntries()">
+                                <option value="all">All Unbilled Entries</option>
+                                <option value="client">This Client Only</option>
+                                <option value="date">Date Range</option>
+                            </select>
+                            
+                            <div class="date-range-filter" id="dateRangeFilter" style="display: none;">
+                                <input type="date" id="billableFromDate">
+                                <span>to</span>
+                                <input type="date" id="billableToDate">
+                            </div>
+                        </div>
+                        
                         <div id="billableTimeEntries" class="billable-entries" role="region" aria-label="Billable time entries">
                             <!-- Populated by JavaScript -->
                         </div>
                     </div>
                     
+                    <!-- Invoice Summary -->
                     <div class="invoice-summary" role="region" aria-label="Invoice summary">
-                        <div class="summary-row">
-                            <span>Total Hours:</span>
-                            <span id="totalHoursBilling" aria-live="polite">0.0h</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>Subtotal:</span>
-                            <span id="totalAmountHT" aria-live="polite">0€</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>VAT (20%):</span>
-                            <span id="totalVAT" aria-live="polite">0€</span>
-                        </div>
-                        <div class="summary-row total">
-                            <span>Total:</span>
-                            <span id="totalAmountTTC" aria-live="polite">0€</span>
+                        <div class="summary-grid">
+                            <div class="summary-row">
+                                <span>Total Hours:</span>
+                                <span id="totalHoursBilling" aria-live="polite">0.0h</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Subtotal:</span>
+                                <span id="totalAmountHT" aria-live="polite">$0.00</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Tax (VAT 20%):</span>
+                                <span id="totalVAT" aria-live="polite">$0.00</span>
+                            </div>
+                            <div class="summary-row total">
+                                <span>Total Amount:</span>
+                                <span id="totalAmountTTC" aria-live="polite">$0.00</span>
+                            </div>
                         </div>
                     </div>
                     
                     <div class="form-actions">
-                        <button type="submit" class="btn-primary">Generate Invoice PDF</button>
-                        <button type="button" class="btn-secondary" onclick="hideInvoiceForm()">Cancel</button>
+                        <button type="submit" class="btn-primary" id="generateInvoiceBtn">
+                            <span class="btn-icon">📄</span>
+                            Generate Invoice
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="billingManager.hideInvoiceForm()">
+                            Cancel
+                        </button>
                     </div>
                 </form>
             </div>
             
             <!-- Generated Invoices List -->
             <div class="invoices-section">
-                <h3>Generated Invoices</h3>
-                <div id="invoicesList" class="invoices-list" role="region" aria-label="Generated invoices list">
-                    <p class="empty-state">No invoices generated yet</p>
+                <header class="subsection-header">
+                    <h3>Recent Invoices</h3>
+                    <div class="invoice-filters">
+                        <select id="invoiceStatusFilter" onchange="billingManager.filterInvoices()">
+                            <option value="">All Statuses</option>
+                            <option value="draft">Draft</option>
+                            <option value="sent">Sent</option>
+                            <option value="paid">Paid</option>
+                            <option value="overdue">Overdue</option>
+                        </select>
+                    </div>
+                </header>
+                
+                <div id="invoicesList" class="invoices-grid" role="region" aria-label="Generated invoices list">
+                    <!-- Invoices will be loaded here by JavaScript -->
+                    <div class="empty-state">
+                        <div class="empty-icon">💰</div>
+                        <p>No invoices generated yet</p>
+                        <button class="btn-primary btn-sm" onclick="billingManager.generateInvoice()">
+                            Create Your First Invoice
+                        </button>
+                    </div>
                 </div>
             </div>
             
-            <!-- Export Section -->
+            <!-- Export & Accounting Section -->
             <div class="export-section">
-                <h3>Accounting Export</h3>
+                <header class="subsection-header">
+                    <h3>Accounting Export</h3>
+                </header>
+                
                 <div class="export-controls">
-                    <label for="exportMonth" class="sr-only">Export Month</label>
-                    <input type="month" id="exportMonth" value="" aria-label="Select month to export">
-                    <button class="btn-secondary" onclick="exportAccounting()" aria-label="Export to Excel">Export Excel</button>
-                    <button class="btn-secondary" onclick="exportCSV()" aria-label="Export to CSV">Export CSV</button>
+                    <div class="export-options">
+                        <div class="form-group">
+                            <label for="exportPeriod">Export Period:</label>
+                            <select id="exportPeriod">
+                                <option value="month">Current Month</option>
+                                <option value="quarter">Current Quarter</option>
+                                <option value="year">Current Year</option>
+                                <option value="custom">Custom Range</option>
+                            </select>
+                        </div>
+                        
+                        <div class="date-range" id="customExportRange" style="display: none;">
+                            <input type="date" id="exportFromDate">
+                            <span>to</span>
+                            <input type="date" id="exportToDate">
+                        </div>
+                    </div>
+                    
+                    <div class="export-actions">
+                        <button class="btn-secondary" onclick="billingManager.exportToExcel()">
+                            <span class="btn-icon">📊</span>
+                            Export to Excel
+                        </button>
+                        <button class="btn-secondary" onclick="billingManager.exportToCSV()">
+                            <span class="btn-icon">📋</span>
+                            Export to CSV
+                        </button>
+                        <button class="btn-secondary" onclick="billingManager.exportToPDF()">
+                            <span class="btn-icon">📄</span>
+                            Export to PDF
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- DOCUMENTS SECTION -->
         <section id="documents" class="main-section" role="main" aria-label="Document Management">
-            <div class="section-header">
+            <header class="section-header">
                 <h1>Document Management</h1>
-                <button class="btn-primary" onclick="showUploadForm()" aria-label="Upload new document">+ Upload Document</button>
-            </div>
+                <div class="header-actions">
+                    <div class="search-bar">
+                        <input type="search" 
+                               id="documentSearch" 
+                               placeholder="Search documents..." 
+                               onkeyup="documentManager.filterDocuments()"
+                               aria-label="Search documents">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                    <select id="documentTypeFilter" onchange="documentManager.filterDocuments()">
+                        <option value="">All Types</option>
+                        <option value="contract">Contracts</option>
+                        <option value="correspondence">Correspondence</option>
+                        <option value="legal_opinion">Legal Opinions</option>
+                        <option value="due_diligence">Due Diligence</option>
+                        <option value="pleading">Pleadings</option>
+                        <option value="evidence">Evidence</option>
+                        <option value="research">Legal Research</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <select id="documentMatterFilter" onchange="documentManager.filterDocuments()">
+                        <option value="">All Matters</option>
+                        <!-- Populated by JavaScript -->
+                    </select>
+                    <button class="btn-primary" onclick="documentManager.showUploadForm()" aria-label="Upload new document">
+                        <span class="btn-icon">📤</span>
+                        Upload Document
+                    </button>
+                </div>
+            </header>
             
-            <!-- Enhanced Upload Form -->
-            <div id="uploadForm" class="form-container" style="display: none;" role="form" aria-label="Document upload form">
-                <h3>📁 New Document</h3>
+            <!-- Document Upload Form -->
+            <div id="documentUploadForm" class="form-container large" style="display: none;" role="form" aria-label="Document upload form">
+                <header class="form-header">
+                    <h3>Upload Documents</h3>
+                    <button class="form-close" onclick="documentManager.hideUploadForm()" aria-label="Close form">✕</button>
+                </header>
                 
-                <!-- Enhanced Drag & Drop Zone -->
-                <div class="upload-zone">
-                    <div class="upload-area" id="uploadArea" role="button" tabindex="0" aria-label="Click or drag files to upload">
-                        <div class="upload-content">
-                            <div class="upload-icon" aria-hidden="true">📎</div>
-                            <div class="upload-text">
-                                <h4>Drag your files here</h4>
-                                <p id="uploadStatus">or click to select</p>
-                                <small>Supported formats: PDF, DOC, DOCX, TXT, JPG, PNG, XLS, XLSX</small>
+                <form onsubmit="documentManager.uploadDocuments(event)" novalidate class="modern-form">
+                    <!-- Drag & Drop Upload Area -->
+                    <div class="upload-zone">
+                        <div class="upload-area" 
+                             id="uploadArea" 
+                             role="button" 
+                             tabindex="0" 
+                             aria-label="Click or drag files to upload"
+                             ondrop="documentManager.handleDrop(event)"
+                             ondragover="documentManager.handleDragOver(event)"
+                             ondragenter="documentManager.handleDragEnter(event)"
+                             ondragleave="documentManager.handleDragLeave(event)"
+                             onclick="document.getElementById('documentFiles').click()">
+                            
+                            <div class="upload-content">
+                                <div class="upload-icon">📎</div>
+                                <div class="upload-text">
+                                    <h4>Drag & Drop Files Here</h4>
+                                    <p id="uploadStatus">or click to browse files</p>
+                                    <small>Supported: PDF, DOC, DOCX, TXT, JPG, PNG, XLS, XLSX (Max 10MB each)</small>
+                                </div>
+                            </div>
+                            
+                            <input type="file" 
+                                   id="documentFiles" 
+                                   multiple 
+                                   accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.xls,.xlsx"
+                                   style="display: none;"
+                                   onchange="documentManager.handleFileSelect(event)">
+                        </div>
+                        
+                        <!-- Upload Progress -->
+                        <div class="upload-progress" id="uploadProgress" style="display: none;">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                            <div class="progress-info">
+                                <span class="progress-text" id="progressText">0%</span>
+                                <span class="progress-status" id="progressStatus">Preparing upload...</span>
                             </div>
                         </div>
-                        <input type="file" id="documentFile" multiple 
-                               accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.xls,.xlsx"
-                               aria-label="Select files to upload">
                     </div>
                     
-                    <!-- Upload Progress -->
-                    <div class="upload-progress" id="uploadProgress" style="display: none;" role="progressbar" aria-label="Upload progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="progressFill"></div>
-                        </div>
-                        <span class="progress-text" id="progressText" aria-live="polite">0%</span>
-                    </div>
-                </div>
-                
-                <!-- Document Details Form -->
-                <form onsubmit="uploadDocument(event)" id="documentUploadForm" novalidate>
-                    <div class="document-details">
+                    <!-- Document Metadata -->
+                    <div class="form-grid">
                         <div class="form-group">
-                            <label for="documentMatter">Associated Matter:</label>
+                            <label for="documentMatter">Associated Matter *</label>
                             <select id="documentMatter" required aria-required="true">
                                 <option value="">Select a matter</option>
+                                <!-- Populated by JavaScript -->
                             </select>
+                            <span class="field-error" id="documentMatterError"></span>
                         </div>
                         
                         <div class="form-group">
-                            <label for="documentType">Document Type:</label>
+                            <label for="documentType">Document Type *</label>
                             <select id="documentType" required aria-required="true">
+                                <option value="">Select document type</option>
                                 <option value="contract">📄 Contract</option>
-                                <option value="duediligence">🔍 Due Diligence</option>
                                 <option value="correspondence">✉️ Correspondence</option>
-                                <option value="opinion">⚖️ Legal Opinion</option>
-                                <option value="note">📝 Note</option>
-                                <option value="other">📋 Other</option>
+                                <option value="legal_opinion">⚖️ Legal Opinion</option>
+                                <option value="due_diligence">🔍 Due Diligence</option>
+                                <option value="pleading">📋 Pleading</option>
+                                <option value="evidence">🔎 Evidence</option>
+                                <option value="research">📚 Legal Research</option>
+                                <option value="other">📁 Other</option>
+                            </select>
+                            <span class="field-error" id="documentTypeError"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="documentConfidentiality">Confidentiality Level</label>
+                            <select id="documentConfidentiality">
+                                <option value="public">Public</option>
+                                <option value="internal" selected>Internal</option>
+                                <option value="confidential">Confidential</option>
+                                <option value="privileged">Attorney-Client Privileged</option>
                             </select>
                         </div>
                         
                         <div class="form-group">
-                            <label for="documentDescription">Description (optional):</label>
-                            <textarea id="documentDescription" 
-                                    placeholder="Document description" 
-                                    rows="3"
-                                    aria-describedby="description-help"></textarea>
+                            <label for="documentTags">Tags</label>
+                            <input type="text" 
+                                   id="documentTags" 
+                                   placeholder="contract, amendment, draft (comma-separated)">
                         </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="documentDescription">Description</label>
+                        <textarea id="documentDescription" 
+                                  placeholder="Brief description of the document contents..." 
+                                  rows="4"></textarea>
                     </div>
                     
                     <div class="form-actions">
-                        <button type="submit" class="btn-primary" id="submitUpload" disabled>
-                            <span class="btn-icon" aria-hidden="true">📤</span>
-                            Upload Document(s)
+                        <button type="submit" class="btn-primary" id="uploadSubmitBtn" disabled>
+                            <span class="btn-icon">📤</span>
+                            Upload Documents
                         </button>
-                        <button type="button" class="btn-secondary" onclick="hideUploadForm()">Cancel</button>
+                        <button type="button" class="btn-secondary" onclick="documentManager.hideUploadForm()">
+                            Cancel
+                        </button>
                     </div>
                 </form>
             </div>
             
-            <!-- Documents Filter & Search -->
-            <div class="documents-filter" role="search" aria-label="Filter and search documents">
-                <div class="filter-group">
-                    <label for="filterMatter">Matter:</label>
-                    <select id="filterMatter" onchange="filterDocuments()" aria-label="Filter by matter">
-                        <option value="">All matters</option>
-                    </select>
+            <!-- Documents Grid -->
+            <div class="content-container">
+                <div class="documents-toolbar">
+                    <div class="view-controls">
+                        <button class="view-btn active" data-view="grid" onclick="documentManager.setView('grid')">
+                            <span class="btn-icon">⊞</span>
+                            Grid
+                        </button>
+                        <button class="view-btn" data-view="list" onclick="documentManager.setView('list')">
+                            <span class="btn-icon">☰</span>
+                            List
+                        </button>
+                    </div>
+                    
+                    <div class="sort-controls">
+                        <select id="documentSort" onchange="documentManager.sortDocuments()">
+                            <option value="date_desc">Date (Newest First)</option>
+                            <option value="date_asc">Date (Oldest First)</option>
+                            <option value="name_asc">Name (A-Z)</option>
+                            <option value="name_desc">Name (Z-A)</option>
+                            <option value="size_desc">Size (Largest First)</option>
+                            <option value="type">Type</option>
+                        </select>
+                    </div>
                 </div>
                 
-                <div class="filter-group">
-                    <label for="filterType">Type:</label>
-                    <select id="filterType" onchange="filterDocuments()" aria-label="Filter by document type">
-                        <option value="">All types</option>
-                        <option value="contract">Contracts</option>
-                        <option value="duediligence">Due Diligence</option>
-                        <option value="correspondence">Correspondence</option>
-                        <option value="opinion">Legal Opinions</option>
-                        <option value="note">Notes</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                
-                <div class="filter-group search-group">
-                    <label for="searchDocuments">Search:</label>
-                    <input type="search" 
-                           id="searchDocuments" 
-                           placeholder="Search documents..." 
-                           onkeyup="filterDocuments()"
-                           aria-label="Search documents">
-                </div>
-            </div>
-            
-            <!-- Documents List -->
-            <div class="documents-container">
                 <div id="documentsList" class="documents-grid" role="region" aria-label="Documents list">
-                    <p class="empty-state">No documents uploaded yet</p>
+                    <!-- Documents will be loaded here by JavaScript -->
+                    <div class="empty-state">
+                        <div class="empty-icon">📁</div>
+                        <p>No documents uploaded yet</p>
+                        <button class="btn-primary btn-sm" onclick="documentManager.showUploadForm()">
+                            Upload Your First Document
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- ANALYTICS SECTION -->
         <section id="analytics" class="main-section" role="main" aria-label="Analytics & Reporting">
-            <div class="section-header">
+            <header class="section-header">
                 <h1>Analytics & Reporting</h1>
-                <div class="period-selector">
-                    <label for="analyticsPeriod" class="sr-only">Select analysis period</label>
-                    <select id="analyticsPeriod" onchange="updateAnalytics()" aria-label="Select analysis period">
+                <div class="header-actions">
+                    <select id="analyticsPeriod" onchange="analyticsManager.updateAnalytics()">
                         <option value="month">This Month</option>
                         <option value="quarter">This Quarter</option>
                         <option value="year">This Year</option>
                         <option value="all">All Time</option>
+                        <option value="custom">Custom Range</option>
                     </select>
+                    
+                    <div class="date-range-picker" id="customAnalyticsRange" style="display: none;">
+                        <input type="date" id="analyticsFromDate">
+                        <span>to</span>
+                        <input type="date" id="analyticsToDate">
+                        <button class="btn-secondary btn-sm" onclick="analyticsManager.applyCustomRange()">
+                            Apply
+                        </button>
+                    </div>
+                    
+                    <button class="btn-secondary" onclick="analyticsManager.exportReport()">
+                        <span class="btn-icon">📊</span>
+                        Export Report
+                    </button>
                 </div>
-            </div>
+            </header>
             
-            <!-- KPIs Row -->
+            <!-- KPIs Dashboard -->
             <div class="analytics-kpis" role="region" aria-label="Key performance indicators">
-                <div class="kpi-card">
-                    <h3 id="kpiRevenue" aria-label="Total revenue">0€</h3>
-                    <p>Revenue</p>
-                    <span id="kpiRevenueChange" class="kpi-change" aria-label="Revenue change">+0%</span>
+                <div class="kpi-card revenue">
+                    <div class="kpi-icon">💰</div>
+                    <div class="kpi-content">
+                        <h3 id="kpiRevenue" aria-label="Total revenue">$0</h3>
+                        <p>Total Revenue</p>
+                        <span class="kpi-change" id="kpiRevenueChange">+0%</span>
+                    </div>
+                    <div class="kpi-chart" id="revenueSparkline"></div>
                 </div>
-                <div class="kpi-card">
-                    <h3 id="kpiHours" aria-label="Billable hours">0h</h3>
-                    <p>Billable Hours</p>
-                    <span id="kpiHoursChange" class="kpi-change" aria-label="Hours change">+0%</span>
+                
+                <div class="kpi-card hours">
+                    <div class="kpi-icon">⏱️</div>
+                    <div class="kpi-content">
+                        <h3 id="kpiHours" aria-label="Billable hours">0h</h3>
+                        <p>Billable Hours</p>
+                        <span class="kpi-change" id="kpiHoursChange">+0%</span>
+                    </div>
+                    <div class="kpi-chart" id="hoursSparkline"></div>
                 </div>
-                <div class="kpi-card">
-                    <h3 id="kpiRate" aria-label="Average rate">0€</h3>
-                    <p>Average Rate</p>
-                    <span id="kpiRateChange" class="kpi-change" aria-label="Rate change">+0%</span>
+                
+                <div class="kpi-card rate">
+                    <div class="kpi-icon">📈</div>
+                    <div class="kpi-content">
+                        <h3 id="kpiRate" aria-label="Average rate">$0</h3>
+                        <p>Average Rate</p>
+                        <span class="kpi-change" id="kpiRateChange">+0%</span>
+                    </div>
+                    <div class="kpi-chart" id="rateSparkline"></div>
                 </div>
-                <div class="kpi-card">
-                    <h3 id="kpiUtilization" aria-label="Utilization rate">0%</h3>
-                    <p>Utilization Rate</p>
-                    <span id="kpiUtilizationChange" class="kpi-change" aria-label="Utilization change">+0%</span>
+                
+                <div class="kpi-card utilization">
+                    <div class="kpi-icon">📊</div>
+                    <div class="kpi-content">
+                        <h3 id="kpiUtilization" aria-label="Utilization rate">0%</h3>
+                        <p>Utilization Rate</p>
+                        <span class="kpi-change" id="kpiUtilizationChange">+0%</span>
+                    </div>
+                    <div class="kpi-chart" id="utilizationSparkline"></div>
                 </div>
             </div>
             
-            <!-- Charts Row -->
+            <!-- Charts Section -->
             <div class="analytics-charts">
                 <div class="chart-container">
-                    <h3>📈 Revenue Evolution</h3>
-                    <canvas id="revenueChart" width="400" height="200" aria-label="Revenue chart"></canvas>
+                    <header class="chart-header">
+                        <h3>Revenue Trend</h3>
+                        <div class="chart-controls">
+                            <select id="revenueChartPeriod" onchange="analyticsManager.updateRevenueChart()">
+                                <option value="daily">Daily</option>
+                                <option value="weekly" selected>Weekly</option>
+                                <option value="monthly">Monthly</option>
+                            </select>
+                        </div>
+                    </header>
+                    <div class="chart-wrapper">
+                        <canvas id="revenueChart" aria-label="Revenue trend chart"></canvas>
+                    </div>
                 </div>
                 
                 <div class="chart-container">
-                    <h3>🥧 Practice Areas Distribution</h3>
-                    <canvas id="practiceChart" width="400" height="200" aria-label="Practice areas distribution chart"></canvas>
+                    <header class="chart-header">
+                        <h3>Practice Areas Distribution</h3>
+                        <div class="chart-controls">
+                            <select id="practiceChartMetric" onchange="analyticsManager.updatePracticeChart()">
+                                <option value="revenue">By Revenue</option>
+                                <option value="hours">By Hours</option>
+                                <option value="matters">By Matters</option>
+                            </select>
+                        </div>
+                    </header>
+                    <div class="chart-wrapper">
+                        <canvas id="practiceChart" aria-label="Practice areas distribution chart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <header class="chart-header">
+                        <h3>Client Performance</h3>
+                        <div class="chart-controls">
+                            <button class="chart-toggle active" data-chart="revenue" onclick="analyticsManager.toggleClientChart('revenue')">
+                                Revenue
+                            </button>
+                            <button class="chart-toggle" data-chart="hours" onclick="analyticsManager.toggleClientChart('hours')">
+                                Hours
+                            </button>
+                        </div>
+                    </header>
+                    <div class="chart-wrapper">
+                        <canvas id="clientChart" aria-label="Client performance chart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <header class="chart-header">
+                        <h3>Monthly Trends</h3>
+                        <div class="chart-controls">
+                            <div class="trend-legends">
+                                <div class="legend-item">
+                                    <span class="legend-color revenue"></span>
+                                    Revenue
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-color hours"></span>
+                                    Hours
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-color matters"></span>
+                                    Matters
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+                    <div class="chart-wrapper">
+                        <canvas id="trendsChart" aria-label="Monthly trends chart"></canvas>
+                    </div>
                 </div>
             </div>
             
-            <!-- Detailed Tables -->
+            <!-- Data Tables Section -->
             <div class="analytics-tables">
                 <div class="table-container">
-                    <h3>Top Clients by Revenue</h3>
-                    <div id="topClientsTable" class="analytics-table" role="region" aria-label="Top clients table"></div>
+                    <header class="table-header">
+                        <h3>Top Clients by Revenue</h3>
+                        <button class="btn-link" onclick="analyticsManager.exportClientData()">
+                            Export Data
+                        </button>
+                    </header>
+                    <div id="topClientsTable" class="analytics-table" role="region" aria-label="Top clients table">
+                        <!-- Table will be populated by JavaScript -->
+                    </div>
                 </div>
                 
                 <div class="table-container">
-                    <h3>Matter Profitability</h3>
-                    <div id="matterProfitabilityTable" class="analytics-table" role="region" aria-label="Matter profitability table"></div>
+                    <header class="table-header">
+                        <h3>Matter Profitability Analysis</h3>
+                        <button class="btn-link" onclick="analyticsManager.exportMatterData()">
+                            Export Data
+                        </button>
+                    </header>
+                    <div id="matterProfitabilityTable" class="analytics-table" role="region" aria-label="Matter profitability table">
+                        <!-- Table will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <header class="table-header">
+                        <h3>Time Utilization by Practice Area</h3>
+                        <button class="btn-link" onclick="analyticsManager.exportUtilizationData()">
+                            Export Data
+                        </button>
+                    </header>
+                    <div id="utilizationTable" class="analytics-table" role="region" aria-label="Utilization table">
+                        <!-- Table will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <header class="table-header">
+                        <h3>Billing Efficiency Metrics</h3>
+                        <button class="btn-link" onclick="analyticsManager.exportEfficiencyData()">
+                            Export Data
+                        </button>
+                    </header>
+                    <div id="efficiencyTable" class="analytics-table" role="region" aria-label="Efficiency metrics table">
+                        <!-- Table will be populated by JavaScript -->
+                    </div>
                 </div>
             </div>
         </section>
@@ -471,172 +1267,206 @@
     <div class="search-modal" id="globalSearchModal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="searchTitle">
         <div class="search-overlay">
             <div class="search-container">
-                <div class="search-header">
+                <header class="search-header">
                     <h2 id="searchTitle" class="sr-only">Global Search</h2>
-                    <input type="search" 
-                           id="globalSearchInput" 
-                           placeholder="Global search... (Ctrl+R)" 
-                           autofocus
-                           aria-label="Global search input">
-                    <button onclick="keyboardManager.hideGlobalSearch()" 
-                            class="search-close" 
-                            aria-label="Close search">✕</button>
-                </div>
+                    <div class="search-input-container">
+                        <span class="search-icon">🔍</span>
+                        <input type="search" 
+                               id="globalSearchInput" 
+                               placeholder="Search clients, matters, documents... (Ctrl+R)" 
+                               autofocus
+                               aria-label="Global search input"
+                               autocomplete="off">
+                        <button onclick="searchManager.hideGlobalSearch()" 
+                                class="search-close" 
+                                aria-label="Close search">✕</button>
+                    </div>
+                </header>
+                
                 <div class="search-results">
                     <div id="searchResults" class="search-results-content" role="region" aria-label="Search results">
-                        <p class="search-hint">Type to search in clients, matters, and time entries...</p>
+                        <div class="search-suggestions">
+                            <h4>Quick Actions</h4>
+                            <div class="suggestions-grid">
+                                <button class="suggestion-btn" onclick="clientManager.showCreateForm()">
+                                    <span class="suggestion-icon">👥</span>
+                                    New Client
+                                </button>
+                                <button class="suggestion-btn" onclick="matterManager.showCreateForm()">
+                                    <span class="suggestion-icon">⚖️</span>
+                                    New Matter
+                                </button>
+                                <button class="suggestion-btn" onclick="timeTracker.startTimer()">
+                                    <span class="suggestion-icon">⏱️</span>
+                                    Start Timer
+                                </button>
+                                <button class="suggestion-btn" onclick="billingManager.generateInvoice()">
+                                    <span class="suggestion-icon">💰</span>
+                                    New Invoice
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="search-tips">
+                            <h4>Search Tips</h4>
+                            <ul>
+                                <li>Type client names, matter codes, or document names</li>
+                                <li>Use quotes for exact phrases: "contract amendment"</li>
+                                <li>Filter by type: client:, matter:, doc:</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
-                <div class="search-footer">
-                    <span>↑↓ Navigate • Enter Select • Esc Close</span>
-                </div>
+                
+                <footer class="search-footer">
+                    <div class="search-shortcuts">
+                        <span class="shortcut">
+                            <kbd>↑↓</kbd> Navigate
+                        </span>
+                        <span class="shortcut">
+                            <kbd>Enter</kbd> Select
+                        </span>
+                        <span class="shortcut">
+                            <kbd>Esc</kbd> Close
+                        </span>
+                    </div>
+                </footer>
             </div>
         </div>
     </div>
 
-    <!-- Keyboard Shortcuts Hint -->
-    <aside class="keyboard-hint" id="keyboardHint" role="complementary" aria-label="Keyboard shortcuts">
-        <h4>⌨️ Keyboard Shortcuts 
-            <button onclick="toggleKeyboardHint()" class="hint-close" aria-label="Close shortcuts hint">✕</button>
-        </h4>
-        <ul role="list">
-            <li><span>Global Search</span> <kbd>Ctrl+R</kbd></li>
-            <li><span>Dashboard</span> <kbd>Ctrl+D</kbd></li>
-            <li><span>New Matter</span> <kbd>Ctrl+N</kbd></li>
-            <li><span>Timer</span> <kbd>Ctrl+T</kbd></li>
-            <li><span>Clients</span> <kbd>Alt+C</kbd></li>
-            <li><span>Matters</span> <kbd>Alt+M</kbd></li>
-            <li><span>Documents</span> <kbd>Alt+D</kbd></li>
-            <li><span>Analytics</span> <kbd>Alt+A</kbd></li>
-        </ul>
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="notification-container" aria-live="polite" aria-atomic="true">
+        <!-- Notifications will be inserted here by JavaScript -->
+    </div>
+
+    <!-- Keyboard Shortcuts Help Panel -->
+    <aside class="keyboard-hints" id="keyboardHints" role="complementary" aria-label="Keyboard shortcuts">
+        <header class="hints-header">
+            <h4>⌨️ Keyboard Shortcuts</h4>
+            <button onclick="keyboardManager.toggleHints()" class="hints-close" aria-label="Close shortcuts panel">✕</button>
+        </header>
+        
+        <div class="hints-content">
+            <div class="hints-section">
+                <h5>Navigation</h5>
+                <ul class="shortcuts-list">
+                    <li>
+                        <span class="shortcut-desc">Dashboard</span>
+                        <kbd>Ctrl</kbd> + <kbd>D</kbd>
+                    </li>
+                    <li>
+                        <span class="shortcut-desc">Global Search</span>
+                        <kbd>Ctrl</kbd> + <kbd>R</kbd>
+                    </li>
+                    <li>
+                        <span class="shortcut-desc">Clients</span>
+                        <kbd>Alt</kbd> + <kbd>C</kbd>
+                    </li>
+                    <li>
+                        <span class="shortcut-desc">Matters</span>
+                        <kbd>Alt</kbd> + <kbd>M</kbd>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="hints-section">
+                <h5>Actions</h5>
+                <ul class="shortcuts-list">
+                    <li>
+                        <span class="shortcut-desc">New Matter</span>
+                        <kbd>Ctrl</kbd> + <kbd>N</kbd>
+                    </li>
+                    <li>
+                        <span class="shortcut-desc">Toggle Timer</span>
+                        <kbd>Ctrl</kbd> + <kbd>T</kbd>
+                    </li>
+                    <li>
+                        <span class="shortcut-desc">Save Form</span>
+                        <kbd>Ctrl</kbd> + <kbd>S</kbd>
+                    </li>
+                    <li>
+                        <span class="shortcut-desc">Cancel/Close</span>
+                        <kbd>Esc</kbd>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </aside>
-    
-    <!-- Error Display -->
-    <div class="error-display" id="errorDisplay" style="display: none;" role="alert" aria-live="assertive">
-        <div class="error-content">
-            <h4>⚠️ Error</h4>
-            <p id="errorMessage"></p>
-            <button onclick="hideError()" class="btn-secondary">Close</button>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;" role="status" aria-label="Loading">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h3 class="loading-title">Prometheus</h3>
+            <p class="loading-text" id="loadingText">Loading application...</p>
         </div>
     </div>
 
-    <!-- Loading Indicator -->
-    <div class="loading-indicator" id="loadingIndicator" style="display: none;" role="status" aria-label="Loading">
-        <div class="loading-spinner" aria-hidden="true"></div>
-        <span class="loading-text">Loading...</span>
+    <!-- Error Boundary -->
+    <div class="error-boundary" id="errorBoundary" style="display: none;" role="alert" aria-live="assertive">
+        <div class="error-content">
+            <div class="error-icon">⚠️</div>
+            <h3>Application Error</h3>
+            <p id="errorMessage">An unexpected error occurred.</p>
+            <div class="error-actions">
+                <button class="btn-primary" onclick="applicationManager.reload()">
+                    Reload Application
+                </button>
+                <button class="btn-secondary" onclick="applicationManager.hideError()">
+                    Dismiss
+                </button>
+            </div>
+        </div>
     </div>
 
-    <!-- Screen Reader Only Content -->
-    <div class="sr-only" id="sr-announcements" aria-live="polite" aria-atomic="true"></div>
-    
-    <!-- Enhanced JavaScript Error Handling -->
-    <script>
-        // Enhanced keyboard hint management
-        function toggleKeyboardHint() {
-            const hint = document.getElementById('keyboardHint');
-            const isVisible = hint.style.display !== 'none';
-            hint.style.display = isVisible ? 'none' : 'block';
-            localStorage.setItem('prometheus_hint_hidden', isVisible);
-        }
-        
-        // Enhanced error display function
-        function showError(message) {
-            const errorDisplay = document.getElementById('errorDisplay');
-            const errorMessage = document.getElementById('errorMessage');
-            if (errorDisplay && errorMessage) {
-                errorMessage.textContent = message;
-                errorDisplay.style.display = 'flex';
-                
-                // Announce to screen readers
-                announceToScreenReader(`Error: ${message}`);
-            }
-        }
-        
-        function hideError() {
-            const errorDisplay = document.getElementById('errorDisplay');
-            if (errorDisplay) {
-                errorDisplay.style.display = 'none';
-            }
-        }
-        
-        // Screen reader announcements
-        function announceToScreenReader(message) {
-            const announcer = document.getElementById('sr-announcements');
-            if (announcer) {
-                announcer.textContent = message;
-                // Clear after announcement
-                setTimeout(() => {
-                    announcer.textContent = '';
-                }, 1000);
-            }
-        }
-        
-        // Loading indicator functions
-        function showLoading() {
-            const loader = document.getElementById('loadingIndicator');
-            if (loader) {
-                loader.style.display = 'flex';
-                announceToScreenReader('Loading content...');
-            }
-        }
-        
-        function hideLoading() {
-            const loader = document.getElementById('loadingIndicator');
-            if (loader) {
-                loader.style.display = 'none';
-            }
-        }
-        
-        // Enhanced auto-hide hint management
-        document.addEventListener('DOMContentLoaded', function() {
-            const hintHidden = localStorage.getItem('prometheus_hint_hidden') === 'true';
-            const hint = document.getElementById('keyboardHint');
-            
-            if (hint) {
-                if (hintHidden) {
-                    hint.style.display = 'none';
-                } else {
-                    // Auto-hide after 10 seconds for new users
-                    setTimeout(() => {
-                        hint.style.opacity = '0.7';
-                        setTimeout(() => {
-                            hint.style.display = 'none';
-                            localStorage.setItem('prometheus_hint_hidden', 'true');
-                        }, 3000);
-                    }, 10000);
-                }
-            }
-        });
-        
-        // Enhanced global error handler
-        window.addEventListener('error', function(event) {
-            if (event.error) {
-                console.error('Global error:', event.error);
-                showError('An unexpected error occurred. Please check the console for details.');
-            }
-        });
-        
-        window.addEventListener('unhandledrejection', function(event) {
-            if (event.reason) {
-                console.error('Unhandled promise rejection:', event.reason);
-                showError('A promise rejection occurred. Please check the console.');
-            }
-        });
+    <!-- Screen Reader Announcements -->
+    <div class="sr-only" id="srAnnouncements" aria-live="polite" aria-atomic="true"></div>
 
-        if ('performance' in window) {
-            window.addEventListener('load', function() {
-                setTimeout(() => {
-                    const perf = performance.getEntriesByType('navigation')[0];
-                    if (perf && perf.loadEventEnd > 3000) {
-                        console.warn('Page load time is slow:', perf.loadEventEnd + 'ms');
-                    }
-                }, 0);
-            });
-        }
-    </script>
-    <script src="script-core.js"></script>
-    <script src="script-ui.js"></script>
-    <script src="prometheus-auth-ui.js"></script>
+    <!-- JavaScript Files -->
+    <script src="prometheus-core.js"></script>
+    <script src="prometheus-ui.js"></script>
     <script src="prometheus-auth.js"></script>
+    <script src="prometheus-auth-ui.js"></script>
+    
+    <!-- Application Initialization -->
+    <script>
+        // Initialize application when DOM is ready
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Show loading screen
+                document.getElementById('loadingOverlay').style.display = 'flex';
+                
+                // Initialize Prometheus application
+                await PrometheusApplication.initialize();
+                
+                // Hide loading screen
+                document.getElementById('loadingOverlay').style.display = 'none';
+                
+                // Announce successful load to screen readers
+                ScreenReaderManager.announce('Prometheus application loaded successfully');
+                
+            } catch (error) {
+                console.error('Application initialization failed:', error);
+                ErrorManager.showCriticalError('Failed to initialize Prometheus application', error);
+            }
+        });
+        
+        // Global error handlers
+        window.addEventListener('error', ErrorManager.handleGlobalError);
+        window.addEventListener('unhandledrejection', ErrorManager.handleUnhandledRejection);
+        
+        // Save data before page unload
+        window.addEventListener('beforeunload', DataManager.saveAllData);
+        
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                DataManager.saveAllData();
+            } else {
+                DataManager.refreshData();
+            }
+        });
+    </script>
 </body>
 </html>
