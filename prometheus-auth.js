@@ -693,6 +693,66 @@ class AuthManager {
             this.cleanExpiredSessions();
         }, 60 * 60 * 1000);
     }
+     showLoginScreen() {
+        if (typeof authUI !== 'undefined' && authUI.showLoginScreen) {
+            authUI.showLoginScreen();
+        } else {
+            console.warn('AuthUI not available, showing fallback login');
+            this.showFallbackLogin();
+        }
+    }
+    
+    showFallbackLogin() {
+        // Fallback basique si AuthUI n'est pas chargé
+        const loginPrompt = prompt('Username:');
+        if (loginPrompt) {
+            const passwordPrompt = prompt('Password:');
+            if (passwordPrompt) {
+                return this.login(loginPrompt, passwordPrompt);
+            }
+        }
+        throw new Error('Login cancelled');
+    }
+    
+    // CORRIGER le hachage faible (CRITIQUE pour sécurité)
+    hashPassword(password) {
+        // TODO: Remplacer par bcrypt en production
+        // Cette implémentation est temporaire et DANGEREUSE
+        console.warn('🚨 SÉCURITÉ: Hachage faible utilisé - remplacer par bcrypt');
+        
+        // Amélioration temporaire avec crypto API si disponible
+        if (window.crypto && window.crypto.subtle) {
+            // Utiliser Web Crypto API si disponible
+            return this.hashPasswordCrypto(password);
+        }
+        
+        // Fallback amélioré (mais toujours faible)
+        const salt = 'prometheus_salt_2024_' + Date.now();
+        let hash = 0;
+        const combined = password + salt;
+        
+        for (let i = 0; i < combined.length; i++) {
+            const char = combined.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
+        
+        // Ajouter plusieurs passes
+        for (let i = 0; i < 1000; i++) {
+            hash = ((hash << 5) - hash) + hash;
+            hash = hash & hash;
+        }
+        
+        return Math.abs(hash).toString(16) + '_' + salt.slice(-8);
+    }
+    
+    async hashPasswordCrypto(password) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password + 'prometheus_salt_2024');
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
 }
 
 // Export for module usage

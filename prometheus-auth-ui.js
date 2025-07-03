@@ -4,9 +4,6 @@
 
 'use strict';
 
-// ========================================
-// AUTHENTICATION UI MANAGER
-// ========================================
 class AuthUI {
     constructor(authManager, app) {
         this.authManager = authManager;
