@@ -750,6 +750,7 @@ class AuthManager {
             console.error('❌ Password migration failed:', error);
         }
     }
+    
 }
 
 // ========================================
