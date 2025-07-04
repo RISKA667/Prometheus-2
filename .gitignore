@@ -1,0 +1,372 @@
+# ========================================
+# PROMETHEUS - GITIGNORE
+# BRDN Conseils - Legal Management System
+# ========================================
+
+# ========================================
+# NODE.JS & NPM
+# ========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# node-waf configuration
+.lock-wscript
+
+# Compiled binary addons
+build/Release
+
+# Dependency directories
+jspm_packages/
+
+# Snowpack dependency directory
+web_modules/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# ========================================
+# ELECTRON SPECIFIC
+# ========================================
+
+# Electron build output
+dist/
+build/
+out/
+release/
+
+# Electron packager output
+*-darwin-x64/
+*-linux-x64/
+*-win32-x64/
+*-win32-ia32/
+
+# Electron builder output
+app-builds/
+electron-builder-output/
+
+# Native addons compiled for Electron
+node_modules/.bin/
+*.node
+
+# Electron main process debug logs
+electron-debug.log
+
+# Auto-generated Electron files
+.electron-gyp/
+
+# ========================================
+# PROMETHEUS APP DATA
+# ========================================
+
+# User data & database
+data/
+storage/
+backups/
+user-data/
+
+# Application logs
+logs/
+*.log
+
+# Temporary files
+temp/
+tmp/
+cache/
+
+# User uploads
+uploads/
+documents/
+attachments/
+
+# Configuration files with sensitive data
+config/local.js
+config/production.js
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Application settings
+settings.json
+user-preferences.json
+
+# Local storage exports
+prometheus-backup-*.json
+prometheus-export-*.csv
+
+# ========================================
+# DEVELOPMENT FILES
+# ========================================
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# ========================================
+# SYSTEM FILES
+# ========================================
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ========================================
+# SECURITY & SENSITIVE DATA
+# ========================================
+
+# API keys and secrets
+.env*
+secrets.json
+keys/
+certificates/
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Authentication files
+auth-config.json
+oauth-tokens.json
+session-keys.json
+
+# Database files (if using local DB)
+*.db
+*.sqlite
+*.sqlite3
+prometheus.db*
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# ========================================
+# BUILD & DEPLOYMENT
+# ========================================
+
+# Build artifacts
+*.tar.gz
+*.zip
+*.rar
+*.7z
+
+# Installation packages
+*.exe
+*.dmg
+*.pkg
+*.deb
+*.rpm
+
+# Docker
+Dockerfile.local
+docker-compose.override.yml
+
+# Deployment scripts
+deploy.sh
+deploy.bat
+release-notes.txt
+
+# ========================================
+# TESTING
+# ========================================
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Test artifacts
+test-results/
+test-reports/
+screenshots/
+
+# Jest
+jest-coverage/
+
+# Cypress
+cypress/videos/
+cypress/screenshots/
+
+# ========================================
+# LEGAL & COMPLIANCE
+# ========================================
+
+# Client data exports (NEVER commit client data)
+client-exports/
+matter-exports/
+billing-exports/
+time-exports/
+
+# Legal documents (may contain sensitive info)
+legal-templates/private/
+confidential-docs/
+
+# Audit trails
+audit-logs/
+security-logs/
+
+# ========================================
+# MISCELLANEOUS
+# ========================================
+
+# Temporary editor files
+*.tmp
+*.temp
+*~$*
+
+# Lock files
+package-lock.json  # Uncomment if using yarn
+yarn.lock         # Uncomment if using npm
+
+# Runtime configuration
+runtime-config.json
+
+# Performance monitoring
+.trace
+.traceback
+
+# Error dumps
+core
+*.core
+*.dump
+
+# Benchmarks
+benchmark-results/
+
+# Documentation builds
+docs/build/
+docs/dist/
+
+# ========================================
+# PROJECT SPECIFIC
+# ========================================
+
+# Prometheus specific files to ignore
+prometheus-user-*.json
+brdn-backup-*.json
+legal-data-export-*.csv
+
+# Development notes (may contain sensitive info)
+dev-notes.md
+todo-private.md
+client-requirements-confidential.md
+
+# Local development overrides
+local-config.js
+dev-settings.json
+
+# ========================================
+# KEEP THIS FILE
+# ========================================
+# !.gitignore

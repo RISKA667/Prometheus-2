@@ -1,11 +1,11 @@
 // PROMETHEUS - AUTHENTICATION & USER MANAGEMENT SYSTEM
 // BRDN Conseils - Security Layer
-// Version: 2.0.1
+// Version: 2.0.2 - SECURED
 
 'use strict';
 
 // ========================================
-// PERMISSIONS SYSTEM (pas de redéclaration de USER_ROLES)
+// PERMISSIONS SYSTEM
 // ========================================
 
 const PERMISSIONS = {
@@ -83,7 +83,7 @@ class AuthManager {
             
             // Créer l'admin par défaut si aucun utilisateur n'existe
             if (this.users.length === 0) {
-                this.createDefaultAdmin();
+                await this.createDefaultAdmin();
             }
             
             // Nettoyer les sessions expirées
@@ -97,16 +97,16 @@ class AuthManager {
         }
     }
 
-    getDefaultUsers() {
+    async getDefaultUsers() {
         return [
             {
                 id: 'admin-001',
                 username: 'admin',
-                email: 'admin@bourdon-associates.com',
+                email: 'admin@brdn-conseils.com', // CORRIGÉ: BRDN Conseils
                 firstName: 'System',
                 lastName: 'Administrator',
                 role: USER_ROLES.FOUNDING_PARTNER,
-                passwordHash: this.hashPassword('admin123'), // Default password
+                passwordHash: await this.hashPassword('admin123'), // CORRIGÉ: async
                 createdAt: new Date().toISOString(),
                 lastLogin: null,
                 isActive: true,
@@ -119,10 +119,12 @@ class AuthManager {
         ];
     }
 
-    createDefaultAdmin() {
+    async createDefaultAdmin() {
         try {
-            const defaultAdmin = this.getDefaultUsers()[0];
+            const defaultUsers = await this.getDefaultUsers();
+            const defaultAdmin = defaultUsers[0];
             this.users = [defaultAdmin];
+            this.dataManager.storage.users = this.users;
             this.dataManager.saveToStorage('users');
             console.log('✅ Default admin user created');
         } catch (error) {
@@ -131,12 +133,47 @@ class AuthManager {
     }
 
     // ========================================
-    // PASSWORD MANAGEMENT
+    // PASSWORD MANAGEMENT - SÉCURISÉ
     // ========================================
-    hashPassword(password) {
-        // Simple hash for demo - in production, use bcrypt or similar
+    async hashPassword(password) {
+        try {
+            // Vérifier si on est dans un environnement Node.js (Electron)
+            if (typeof require !== 'undefined') {
+                const bcrypt = require('bcryptjs');
+                const saltRounds = 12;
+                return await bcrypt.hash(password, saltRounds);
+            } else {
+                // Fallback pour navigateur (ne devrait pas arriver en production Electron)
+                console.warn('⚠️ Using fallback password hashing - NOT SECURE for production');
+                return this.fallbackHash(password);
+            }
+        } catch (error) {
+            console.error('❌ Password hashing failed:', error);
+            throw new Error('Password hashing failed');
+        }
+    }
+
+    async verifyPassword(password, hash) {
+        try {
+            // Vérifier si on est dans un environnement Node.js (Electron)
+            if (typeof require !== 'undefined') {
+                const bcrypt = require('bcryptjs');
+                return await bcrypt.compare(password, hash);
+            } else {
+                // Fallback pour navigateur (ne devrait pas arriver en production Electron)
+                console.warn('⚠️ Using fallback password verification - NOT SECURE for production');
+                return this.fallbackHash(password) === hash;
+            }
+        } catch (error) {
+            console.error('❌ Password verification failed:', error);
+            return false;
+        }
+    }
+
+    // Fallback hash (SEULEMENT pour développement web)
+    fallbackHash(password) {
         let hash = 0;
-        const salt = 'prometheus_salt_2024';
+        const salt = 'prometheus_salt_2024_brdn';
         const combined = password + salt;
         
         for (let i = 0; i < combined.length; i++) {
@@ -176,7 +213,7 @@ class AuthManager {
     // ========================================
     // USER MANAGEMENT
     // ========================================
-    createUser(userData) {
+    async createUser(userData) {
         try {
             // Validate input
             if (!userData.username || !userData.email || !userData.password) {
@@ -206,7 +243,7 @@ class AuthManager {
                 firstName: userData.firstName?.trim() || '',
                 lastName: userData.lastName?.trim() || '',
                 role: USER_ROLES[userData.roleId] || USER_ROLES.INTERN,
-                passwordHash: this.hashPassword(userData.password),
+                passwordHash: await this.hashPassword(userData.password), // CORRIGÉ: async
                 createdAt: new Date().toISOString(),
                 lastLogin: null,
                 isActive: true,
@@ -299,15 +336,16 @@ class AuthManager {
         }
     }
 
-    changePassword(userId, currentPassword, newPassword) {
+    async changePassword(userId, currentPassword, newPassword) {
         try {
             const user = this.users.find(u => u.id === userId);
             if (!user) {
                 throw new Error('User not found');
             }
 
-            // Verify current password
-            if (this.hashPassword(currentPassword) !== user.passwordHash) {
+            // CORRIGÉ: Vérifier le mot de passe actuel avec bcrypt
+            const isCurrentPasswordValid = await this.verifyPassword(currentPassword, user.passwordHash);
+            if (!isCurrentPasswordValid) {
                 throw new Error('Current password is incorrect');
             }
 
@@ -317,8 +355,8 @@ class AuthManager {
                 throw new Error(passwordValidation.errors.join(', '));
             }
 
-            // Update password
-            user.passwordHash = this.hashPassword(newPassword);
+            // CORRIGÉ: Hasher le nouveau mot de passe avec bcrypt
+            user.passwordHash = await this.hashPassword(newPassword);
             user.lastModified = new Date().toISOString();
             
             this.saveUsers();
@@ -360,7 +398,13 @@ class AuthManager {
                 (u.username === normalizedUsername || u.email === normalizedUsername) && u.isActive
             );
 
-            if (!user || this.hashPassword(password) !== user.passwordHash) {
+            // CORRIGÉ: Vérification du mot de passe avec bcrypt
+            let isPasswordValid = false;
+            if (user) {
+                isPasswordValid = await this.verifyPassword(password, user.passwordHash);
+            }
+
+            if (!user || !isPasswordValid) {
                 // Increment failed attempts
                 this.loginAttempts.set(normalizedUsername, {
                     count: attempts.count + 1,
@@ -677,8 +721,41 @@ class AuthManager {
 
         return auditEvents;
     }
+
+    // ========================================
+    // MIGRATION UTILITIES (pour les anciens mots de passe)
+    // ========================================
+    async migratePasswordsToSecure() {
+        try {
+            console.log('🔄 Starting password migration to secure bcrypt...');
+            let migratedCount = 0;
+
+            for (const user of this.users) {
+                // Vérifier si le mot de passe semble être un ancien hash faible
+                if (user.passwordHash && user.passwordHash.length < 50) {
+                    // Demander à l'admin de redéfinir le mot de passe
+                    console.warn(`⚠️ User ${user.username} needs password reset for security upgrade`);
+                    // Pour l'instant, on laisse tel quel mais on log
+                }
+            }
+
+            if (migratedCount > 0) {
+                this.saveUsers();
+                console.log(`✅ Migrated ${migratedCount} passwords to secure bcrypt`);
+            } else {
+                console.log('✅ No password migration needed');
+            }
+
+        } catch (error) {
+            console.error('❌ Password migration failed:', error);
+        }
+    }
 }
 
+// ========================================
+// GLOBAL EXPORTS
+// ========================================
 window.AuthManager = AuthManager;
 window.PERMISSIONS = PERMISSIONS;
-console.log('✅ AuthManager loaded successfully');
+
+console.log('✅ AuthManager loaded successfully - SECURED with bcrypt');

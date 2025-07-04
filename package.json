@@ -1,0 +1,186 @@
+{
+  "name": "prometheus-legal",
+  "version": "3.0.1",
+  "description": "Prometheus Legal Management System - BRDN Conseils",
+  "main": "main.js",
+  "homepage": "./",
+  "author": {
+    "name": "BRDN Conseils",
+    "email": "dev@brdn-conseils.com"
+  },
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build-win": "electron-builder --win",
+    "build-mac": "electron-builder --mac",
+    "build-linux": "electron-builder --linux",
+    "dist": "npm run build",
+    "pack": "electron-builder --dir",
+    "test": "echo \"No tests specified\" && exit 0",
+    "clean": "rimraf dist build",
+    "rebuild": "electron-rebuild",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2"
+  },
+  "devDependencies": {
+    "electron": "^37.2.0",
+    "electron-builder": "^26.0.12"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "keywords": [
+    "legal",
+    "law-firm",
+    "case-management",
+    "time-tracking",
+    "billing",
+    "electron",
+    "desktop-app"
+  ],
+  "build": {
+    "appId": "com.brdn-conseils.prometheus",
+    "productName": "Prometheus Legal",
+    "asar": true,
+    "compression": "maximum",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build-resources"
+    },
+    "files": [
+      "**/*",
+      "!node_modules/**/*",
+      "!src/**/*",
+      "!.git/**/*",
+      "!.gitignore",
+      "!README.md",
+      "!*.md",
+      "!docs/**/*",
+      "!tests/**/*",
+      "!coverage/**/*",
+      "!.nyc_output/**/*",
+      "!build-resources/**/*",
+      "!.vscode/**/*",
+      "!.idea/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "assets/",
+        "to": "assets/",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build-resources/icon.ico",
+      "requestedExecutionLevel": "asInvoker",
+      "artifactName": "${productName}-${version}-${arch}.${ext}",
+      "publisherName": "BRDN Conseils"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "build-resources/icon.icns",
+      "category": "public.app-category.business",
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build-resources/icon.png",
+      "category": "Office",
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": false,
+      "installerIcon": "build-resources/installer-icon.ico",
+      "uninstallerIcon": "build-resources/uninstaller-icon.ico",
+      "installerHeaderIcon": "build-resources/installer-header.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Prometheus Legal",
+      "include": "build-resources/installer.nsh",
+      "displayLanguageSelector": true,
+      "installerLanguages": [
+        "en",
+        "fr"
+      ]
+    },
+    "dmg": {
+      "title": "${productName} ${version}",
+      "icon": "build-resources/dmg-icon.icns",
+      "background": "build-resources/dmg-background.png",
+      "window": {
+        "width": 540,
+        "height": 380
+      },
+      "contents": [
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 130,
+          "y": 220,
+          "type": "file"
+        }
+      ]
+    },
+    "publish": {
+      "provider": "generic",
+      "url": "https://releases.brdn-conseils.com/"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brdn-conseils/prometheus.git"
+  },
+  "bugs": {
+    "url": "https://github.com/brdn-conseils/prometheus/issues"
+  }
+}
