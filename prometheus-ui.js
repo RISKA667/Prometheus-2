@@ -1,9 +1,7 @@
 /**
- * PROMETHEUS.EXE - USER INTERFACE MANAGEMENT SYSTEM
- * BOURDON & Associates - Legal Management System
- * Version: 3.0.0 - Full English Native + Vectorized Architecture
- * 
- * Comprehensive UI management, component rendering, and user interactions
+ * PROMETHEUS - USER INTERFACE MANAGEMENT SYSTEM
+ * BRDN Conseils - Legal Management System
+ * Version: 3.0.0
  */
 
 'use strict';
@@ -1394,7 +1392,6 @@ class ListComponentManager {
     }
 }
 
-// Export managers globally
 window.UIManager = UIManager;
 window.NavigationManager = NavigationManager;
 window.NotificationManager = NotificationManager;

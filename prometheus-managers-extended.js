@@ -1,14 +1,7 @@
 /**
- * PROMETHEUS.EXE - EXTENDED BUSINESS LOGIC MANAGERS
- * BOURDON & Associates - Legal Management System
- * Version: 3.0.0 - Full English Native + Vectorized Architecture
- * 
- * Extended specialized managers:
- * - TimeTracker: Advanced time tracking and productivity analytics
- * - BillingManager: Comprehensive billing and financial management
- * - DocumentManager: Document lifecycle and version control
- * - AnalyticsManager: Business intelligence and reporting
- * - SearchManager: Advanced search and filtering capabilities
+ * PROMETHEUS - EXTENDED BUSINESS LOGIC MANAGERS
+ * BRDN Conseils - Legal Management System
+ * Version: 3.0.0
  */
 
 'use strict';
@@ -1320,10 +1313,10 @@ class BillingManager {
     generateNextInvoiceNumber() {
         const year = new Date().getFullYear();
         const yearInvoices = this.invoices.filter(inv => 
-            inv.number.startsWith(`BOURDON-${year}`)
+            inv.number.startsWith(`BRDN-${year}`)
         );
         const nextNumber = yearInvoices.length + 1;
-        this.nextInvoiceNumber = `BOURDON-${year}-${String(nextNumber).padStart(3, '0')}`;
+        this.nextInvoiceNumber = `BRDN-${year}-${String(nextNumber).padStart(3, '0')}`;
     }
     
     generateInvoicePDF(invoice) {
@@ -1394,12 +1387,12 @@ class BillingManager {
     <div class="container">
         <div class="header">
             <div class="company-info">
-                <div class="logo">⚖️ BOURDON & Associates</div>
+                <div class="logo">BRDN Conseils</div>
                 <p><strong>Legal Counsel & Advisory Services</strong></p>
                 <p>123 Legal District, Suite 500</p>
                 <p>New York, NY 10001</p>
                 <p>Phone: +1 (555) 123-4567</p>
-                <p>Email: billing@bourdon-associates.com</p>
+                <p>Email: billing@brdn-conseils.com</p>
             </div>
             <div class="invoice-info">
                 <h1>INVOICE</h1>
@@ -1486,11 +1479,11 @@ class BillingManager {
             <p><strong>Payment Due:</strong> ${invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : '30 days from invoice date'}</p>
             <p><strong>Payment Methods:</strong> Wire transfer, ACH, or certified check</p>
             <p><strong>Late Fees:</strong> 1.5% per month on overdue amounts</p>
-            <p><strong>Questions:</strong> Contact billing@bourdon-associates.com</p>
+            <p><strong>Questions:</strong> Contact billing@brdn-conseils.com</p>
         </div>
         
         <div class="footer">
-            <p><strong>BOURDON & Associates</strong> | Professional Legal Services</p>
+            <p><strong>BRDN Conseils</strong> | Professional Legal Services</p>
             <p>Thank you for your business. We appreciate the opportunity to serve you.</p>
             <p style="margin-top: 10px; font-size: 12px;">
                 This invoice was generated electronically by Prometheus Legal Management System on ${new Date().toLocaleDateString()}
@@ -1539,43 +1532,61 @@ class BillingManager {
         container.innerHTML = this.filteredInvoices.map(invoice => this.renderInvoiceCard(invoice)).join('');
     }
     
-    renderInvoiceCard(invoice) {
-        const invoiceDate = new Date(invoice.date);
-        const dueDate = invoice.dueDate ? new Date(invoice.dueDate) : null;
-        const isOverdue = dueDate && dueDate < new Date() && invoice.status !== 'paid';
-        
-        return `
-            <div class="invoice-card ${isOverdue ? 'overdue' : ''}" data-invoice-id="${invoice.id}">
-                <div class="invoice-header">
-                    <div class="invoice-number">
-                        <h4>${invoice.number}</h4>
-                        <span class="invoice-status status-${invoice.status}">${invoice.status.toUpperCase()}</span>
+renderInvoiceCard(invoice) {
+    const invoiceDate = new Date(invoice.date);
+    const dueDate = invoice.dueDate ? new Date(invoice.dueDate) : null;
+    const now = new Date();
+    const isOverdue = dueDate && dueDate < now && invoice.status !== 'paid';
+
+    const formatDate = (date) => date.toLocaleDateString('fr-FR');
+
+    return `
+        <div class="invoice-card ${isOverdue ? 'overdue' : ''}" data-invoice-id="${invoice.id}">
+            <div class="invoice-header">
+                <div class="invoice-number">
+                    <h4>${invoice.number}</h4>
+                    <span class="invoice-status status-${invoice.status}">
+                        ${invoice.status.toUpperCase()}
+                    </span>
+                </div>
+                <div class="invoice-amount">
+                    <span class="amount-label">Total</span>
+                    <span class="amount-value">
+                        ${this.app.formatCurrency(invoice.totalTTC, invoice.currency)}
+                    </span>
+                </div>
+            </div>
+
+            <div class="invoice-content">
+                <div class="invoice-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Client:</span>
+                        <span class="detail-value">${this.app.escapeHtml(invoice.clientName)}</span>
                     </div>
-                    <div class="invoice-amount">
-                        <span class="amount-label">Total</span>
-                        <span class="amount-value">${this.app.formatCurrency(invoice.totalTTC, invoice.currency)}</span>
+                    <div class="detail-row">
+                        <span class="detail-label">Date:</span>
+                        <span class="detail-value">${formatDate(invoiceDate)}</span>
+                    </div>
+                    ${
+                        dueDate
+                            ? `<div class="detail-row">
+                                <span class="detail-label">Due Date:</span>
+                                <span class="detail-value ${isOverdue ? 'overdue-text' : ''}">
+                                    ${formatDate(dueDate)}
+                                </span>
+                            </div>`
+                            : ''
+                    }
+                    <div class="detail-row">
+                        <span class="detail-label">Hours:</span>
+                        <span class="detail-value">${invoice.totalHours.toFixed(1)}h</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Notes:</span>
+                        <span class="detail-value">${this.app.escapeHtml(invoice.notes || '—')}</span>
                     </div>
                 </div>
-                
-                <div class="invoice-content">
-                    <div class="invoice-details">
-                        <div class="detail-row">
-                            <span class="detail-label">Client:</span>
-                            <span class="detail-value">${this.app.escapeHtml(invoice.clientName)}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Date:</span>
-                            <span class="detail-value">${invoiceDate.toLocaleDateString()}</span>
-                        </div>
-                        ${dueDate ? `
-                            <div class="detail-row">
-                                <span class="detail-label">Due Date:</span>
-                                <span class="detail-value ${isOverdue ? 'overdue-text' : ''}">${dueDate.toLocaleDateString()}</span>
-                            </div>
-                        ` : ''}
-                        <div class="detail-row">
-                            <span class="detail-label">Hours:</span>
-                            <span class="detail-value">${invoice.totalHours.toFixed(1)}h</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="
+            </div>
+        </div>
+    `;
+}

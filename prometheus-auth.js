@@ -1,6 +1,6 @@
-// PROMETHEUS.EXE - AUTHENTICATION & USER MANAGEMENT SYSTEM
-// BOURDON & Associates - Security Layer
-// Version: 2.0.1 - CORRECTION: Removed duplicate USER_ROLES declaration
+// PROMETHEUS - AUTHENTICATION & USER MANAGEMENT SYSTEM
+// BRDN Conseils - Security Layer
+// Version: 2.0.1
 
 'use strict';
 
@@ -679,8 +679,6 @@ class AuthManager {
     }
 }
 
-// Export for global access
 window.AuthManager = AuthManager;
 window.PERMISSIONS = PERMISSIONS;
-
 console.log('✅ AuthManager loaded successfully');

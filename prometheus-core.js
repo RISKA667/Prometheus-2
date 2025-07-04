@@ -1,15 +1,7 @@
 /**
- * PROMETHEUS.EXE - CORE APPLICATION LOGIC (CORRIGÉ)
- * BOURDON & Associates - Legal Management System
- * Version: 3.0.1 - Corrections critiques appliquées
- * 
- * Core business logic, data management, and application state management
- * CORRECTIONS MAJEURES:
- * - Références de classes corrigées
- * - Gestion d'erreurs robuste
- * - Validation des données
- * - Sécurité renforcée
- * - Ordre d'initialisation fixé
+ * PROMETHEUS - CORE APPLICATION LOGIC
+ * BRDN Conseils - Legal Management System
+ * Version: 3.0.1
  */
 
 'use strict';
@@ -21,7 +13,7 @@
 const APP_CONFIG = {
     name: 'Prometheus',
     version: '3.0.1',
-    company: 'BOURDON & Associates',
+    company: 'BRDN Conseils',
     
     // Environnement
     isDevelopment: window.location.hostname === 'localhost' || 
@@ -2502,52 +2494,54 @@ class ScreenReaderManager {
 }
 
 // ========================================
-// EXPOSITION GLOBALE
+// EXPOSITION GLOBALE (via namespace unique)
 // ========================================
 
-// Exposer les classes globalement
-window.PrometheusApplication = PrometheusApplication;
-window.DataManager = DataManager;
-window.ErrorManager = ErrorManager;
-window.ScreenReaderManager = ScreenReaderManager;
-window.DataValidator = DataValidator;
-window.Logger = Logger;
-
-// Exposer la configuration globalement
-window.APP_CONFIG = APP_CONFIG;
-window.USER_ROLES = USER_ROLES;
-window.PRACTICE_AREAS = PRACTICE_AREAS;
-window.DOCUMENT_TYPES = DOCUMENT_TYPES;
-
-// Exposer le logger global
-window.logger = logger;
+if (!window.prometheus) {
+    window.prometheus = {
+        PrometheusApplication,
+        DataManager,
+        ErrorManager,
+        ScreenReaderManager,
+        DataValidator,
+        Logger,
+        logger,
+        APP_CONFIG,
+        USER_ROLES,
+        PRACTICE_AREAS,
+        DOCUMENT_TYPES
+    };
+}
 
 // ========================================
 // GESTION D'ERREURS GLOBALES
 // ========================================
 
-// Handler d'erreurs JavaScript globales
 window.addEventListener('error', (event) => {
-    ErrorManager.handleError(event.error || new Error(event.message), 'GlobalJavaScriptError');
+    const error = event.error || new Error(event.message);
+    window.prometheus?.ErrorManager?.handleError?.(error, 'GlobalJavaScriptError');
 });
 
-// Handler de rejets de promesses
 window.addEventListener('unhandledrejection', (event) => {
-    ErrorManager.handleError(event.reason || new Error('Unhandled promise rejection'), 'UnhandledPromiseRejection');
+    const reason = event.reason || new Error('Unhandled promise rejection');
+    window.prometheus?.ErrorManager?.handleError?.(reason, 'UnhandledPromiseRejection');
 });
 
-// Message de bienvenue en développement
-if (APP_CONFIG.isDevelopment) {
-    console.log('%c🚀 Prometheus Legal Management System', 'color: #4a9eff; font-size: 16px; font-weight: bold;');
+// ========================================
+// LOGS EN MODE DÉVELOPPEMENT
+// ========================================
+
+if (window.prometheus.APP_CONFIG?.isDevelopment) {
+    console.log('%cPrometheus Legal Management System', 'color: #4a9eff; font-size: 16px; font-weight: bold;');
     console.log('%cVersion 3.0.1 - Development Mode', 'color: #888; font-size: 12px;');
-    console.log('%c⚖️ BOURDON & Associates', 'color: #4a9eff; font-size: 14px;');
+    console.log('%cBRDN Conseils', 'color: #4a9eff; font-size: 14px;');
     console.log('');
-    console.log('Available global objects:');
-    console.log('- window.prometheus (main app instance)');
-    console.log('- window.logger (logging system)');
-    console.log('- window.APP_CONFIG (configuration)');
-    console.log('- window.USER_ROLES (role definitions)');
-    console.log('- window.PRACTICE_AREAS (practice area definitions)');
+    console.log('Available global object: window.prometheus');
+    console.log(Object.keys(window.prometheus).map(key => `- ${key}`).join('\n'));
 }
 
-logger.info('Prometheus core module loaded successfully');
+// ========================================
+// CONFIRMATION DE CHARGEMENT
+// ========================================
+
+window.prometheus?.logger?.info?.('Prometheus core module loaded successfully');

@@ -1,6 +1,6 @@
-// PROMETHEUS.EXE - AUTHENTICATION UI COMPONENTS
-// BOURDON & Associates - Authentication Interface
-// Version: 2.0.0 - Production Ready
+// PROMETHEUS - AUTHENTICATION UI COMPONENTS
+// BRDN Conseils - Authentication Interface
+// Version: 1.1.5
 
 'use strict';
 
@@ -40,8 +40,8 @@ class AuthUI {
                 <div class="login-container">
                     <div class="login-header">
                         <div class="login-logo">
-                            <h1>⚖️ Prometheus.exe</h1>
-                            <p>BOURDON & Associates</p>
+                            <h1>Prometheus</h1>
+                            <p>BRDN Conseils</p>
                             <small>Legal Management System</small>
                         </div>
                     </div>
@@ -100,7 +100,7 @@ class AuthUI {
                         <ul>
                             <li><strong>Version:</strong> ${APP_CONFIG.version}</li>
                             <li><strong>Environment:</strong> Production</li>
-                            <li><strong>Support:</strong> it@bourdon-associates.com</li>
+                            <li><strong>Support:</strong> it@brdn-conseils.com</li>
                         </ul>
                     </div>
                 </div>
@@ -134,8 +134,13 @@ class AuthUI {
             section.style.display = 'none';
         });
         
-        // Announce to screen readers
-        PrometheusUtils.announceToScreenReader('Please sign in to continue');
+        // Announce to screen readers - CORRECTION: Utiliser ScreenReaderManager
+        if (window.ScreenReaderManager && typeof ScreenReaderManager.announce === 'function') {
+            ScreenReaderManager.announce('Please sign in to continue');
+        } else {
+            // Fallback si ScreenReaderManager n'est pas disponible
+            console.log('Screen reader: Please sign in to continue');
+        }
     }
 
     hideLoginScreen() {
@@ -165,7 +170,12 @@ class AuthUI {
         // Load user's preferred section
         const currentUser = this.authManager.getCurrentUser();
         if (currentUser) {
-            PrometheusUtils.announceToScreenReader(`Welcome back, ${currentUser.firstName || currentUser.username}`);
+            // Announce to screen readers - CORRECTION: Utiliser ScreenReaderManager
+            if (window.ScreenReaderManager && typeof ScreenReaderManager.announce === 'function') {
+                ScreenReaderManager.announce(`Welcome back, ${currentUser.firstName || currentUser.username}`);
+            } else {
+                console.log(`Screen reader: Welcome back, ${currentUser.firstName || currentUser.username}`);
+            }
         }
     }
 
@@ -225,8 +235,12 @@ class AuthUI {
                 errorDiv.style.display = 'none';
             }, 5000);
             
-            // Announce to screen readers
-            PrometheusUtils.announceToScreenReader(`Login error: ${message}`);
+            // Announce to screen readers - CORRECTION: Utiliser ScreenReaderManager
+            if (window.ScreenReaderManager && typeof ScreenReaderManager.announce === 'function') {
+                ScreenReaderManager.announce(`Login error: ${message}`);
+            } else {
+                console.log(`Screen reader: Login error: ${message}`);
+            }
         }
     }
 
@@ -327,41 +341,68 @@ class AuthUI {
         if (!currentUser) return;
         
         // Update user info in navbar
-        document.getElementById('currentUserName').textContent = 
-            currentUser.firstName ? `${currentUser.firstName} ${currentUser.lastName}` : currentUser.username;
-        document.getElementById('currentUserRole').textContent = currentUser.role.name;
+        const currentUserName = document.getElementById('currentUserName');
+        const currentUserRole = document.getElementById('currentUserRole');
+        
+        if (currentUserName) {
+            currentUserName.textContent = 
+                currentUser.firstName ? `${currentUser.firstName} ${currentUser.lastName}` : currentUser.username;
+        }
+        
+        if (currentUserRole) {
+            currentUserRole.textContent = currentUser.role.name;
+        }
         
         // Update user menu details
-        document.getElementById('menuUserName').textContent = 
-            currentUser.firstName ? `${currentUser.firstName} ${currentUser.lastName}` : currentUser.username;
-        document.getElementById('menuUserEmail').textContent = currentUser.email;
-        document.getElementById('menuUserRole').textContent = currentUser.role.name;
+        const menuUserName = document.getElementById('menuUserName');
+        const menuUserEmail = document.getElementById('menuUserEmail');
+        const menuUserRole = document.getElementById('menuUserRole');
+        
+        if (menuUserName) {
+            menuUserName.textContent = 
+                currentUser.firstName ? `${currentUser.firstName} ${currentUser.lastName}` : currentUser.username;
+        }
+        
+        if (menuUserEmail) {
+            menuUserEmail.textContent = currentUser.email;
+        }
+        
+        if (menuUserRole) {
+            menuUserRole.textContent = currentUser.role.name;
+        }
         
         // Show admin section if user has admin permissions
         const adminSection = document.getElementById('adminSection');
-        if (this.authManager.hasPermission('users.view')) {
-            adminSection.style.display = 'block';
-        } else {
-            adminSection.style.display = 'none';
+        if (adminSection) {
+            if (this.authManager.hasPermission('users.view')) {
+                adminSection.style.display = 'block';
+            } else {
+                adminSection.style.display = 'none';
+            }
         }
         
         // Update session expiry
         if (currentSession) {
-            const expiryDate = new Date(currentSession.expiresAt);
-            document.getElementById('sessionExpiry').textContent = 
-                expiryDate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+            const sessionExpiry = document.getElementById('sessionExpiry');
+            if (sessionExpiry) {
+                const expiryDate = new Date(currentSession.expiresAt);
+                sessionExpiry.textContent = 
+                    expiryDate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+            }
         }
         
         // Set user avatar based on role
         const avatar = document.getElementById('userAvatar');
-        const roleAvatars = {
-            'founding_partner': '👑',
-            'partner': '💼',
-            'associate': '⚖️',
-            'assistant': '📋',
-            'intern': '🎓'
-        };
-        avatar.textContent = roleAvatars[currentUser.role.id] || '👤';
+        if (avatar) {
+            const roleAvatars = {
+                'founding_partner': '👑',
+                'partner': '💼',
+                'associate': '⚖️',
+                'assistant': '📋',
+                'intern': '🎓'
+            };
+            avatar.textContent = roleAvatars[currentUser.role.id] || '👤';
+        }
     }
 
     toggleUserMenu() {
@@ -379,8 +420,11 @@ class AuthUI {
     }
 
     hideUserMenu() {
-        document.getElementById('userMenu').style.display = 'none';
-        this.currentUserMenuVisible = false;
+        const userMenu = document.getElementById('userMenu');
+        if (userMenu) {
+            userMenu.style.display = 'none';
+            this.currentUserMenuVisible = false;
+        }
     }
 
     extendSession() {
@@ -464,17 +508,25 @@ class AuthUI {
     }
 
     hideUserManagement() {
-        document.getElementById('userManagementModal').style.display = 'none';
+        const modal = document.getElementById('userManagementModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
     }
 
     loadUsersTable() {
         const tbody = document.getElementById('usersTableBody');
+        const totalUsers = document.getElementById('totalUsers');
+        const activeUsers = document.getElementById('activeUsers');
+        
+        if (!tbody) return;
+        
         const users = this.authManager.getAllUsers();
         const stats = this.authManager.getUserStats();
         
         // Update stats
-        document.getElementById('totalUsers').textContent = stats.total;
-        document.getElementById('activeUsers').textContent = stats.active;
+        if (totalUsers) totalUsers.textContent = stats.total;
+        if (activeUsers) activeUsers.textContent = stats.active;
         
         // Load users
         tbody.innerHTML = users.map(user => `
@@ -578,23 +630,22 @@ class AuthUI {
     // UTILITY METHODS
     // ========================================
     showSuccessMessage(message) {
-        if (typeof ui !== 'undefined' && ui.showSuccess) {
-            ui.showSuccess(message);
+        if (window.notificationManager && window.notificationManager.showSuccess) {
+            window.notificationManager.showSuccess(message);
         } else {
             console.log('Success:', message);
         }
     }
 
     showErrorMessage(message) {
-        if (typeof ui !== 'undefined' && ui.showError) {
-            ui.showError(message);
+        if (window.notificationManager && window.notificationManager.showError) {
+            window.notificationManager.showError(message);
         } else {
             console.error('Error:', message);
             alert(message);
         }
     }
 
-    // Placeholder methods for future implementation
     showProfileSettings() {
         this.showErrorMessage('Profile settings coming soon');
     }
@@ -634,5 +685,4 @@ class AuthUI {
     }
 }
 
-// Global variable for access
 let authUI;

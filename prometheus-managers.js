@@ -1,16 +1,7 @@
 /**
- * PROMETHEUS.EXE - SPECIALIZED BUSINESS LOGIC MANAGERS
- * BOURDON & Associates - Legal Management System
- * Version: 3.0.0 - Full English Native + Vectorized Architecture
- * 
- * Specialized managers for different business domains:
- * - ClientManager: Client relationship management
- * - MatterManager: Legal matter lifecycle management
- * - TimeTracker: Time tracking and billing
- * - BillingManager: Invoice generation and accounting
- * - DocumentManager: Document lifecycle management
- * - AnalyticsManager: Business intelligence and reporting
- * - SearchManager: Global search and filtering
+ * PROMETHEUS - SPECIALIZED BUSINESS LOGIC MANAGERS
+ * BRDN Conseils - Legal Management System
+ * Version: 3.0.0
  */
 
 'use strict';
@@ -1338,6 +1329,5 @@ class MatterManager {
     }
 }
 
-// Export managers globally
 window.ClientManager = ClientManager;
 window.MatterManager = MatterManager;
